@@ -1,0 +1,7 @@
+[init]
+	defaultBranch = main
+[user]
+	email = me@kevinlangleyjr.com
+	name = Kevin Langley Jr
+[core]
+	excludesFile = ~/.gitignore_global
