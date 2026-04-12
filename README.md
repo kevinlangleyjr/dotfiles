@@ -26,7 +26,7 @@ The installer **does not** overwrite `~/.zshrc`. It prints the snippets you shou
 ### Option A: Clone, then run the script
 
 ```bash
-git clone <your-repo-url> ~/.dotfiles
+git clone git@github.com:kevinlangleyjr/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 ./install.sh
 ```
@@ -35,20 +35,20 @@ If the repo already lives somewhere else, run `./install.sh` from that clone; th
 
 ### Option B: One-liner (remote script)
 
-Replace the URL with your **raw** `install.sh` and set **`REPO_URL`** to the same dotfiles repo you want cloned under `~/.dotfiles`:
+Uses the default clone URL baked into `install.sh` (SSH). You need [GitHub SSH access](https://docs.github.com/en/authentication/connecting-to-github-with-ssh) for a fresh clone; otherwise set `REPO_URL` to an HTTPS URL. Forks can override with **`REPO_URL`**.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/<you>/<repo>/main/install.sh | REPO_URL='https://github.com/<you>/<repo>.git' bash -s
+curl -fsSL https://raw.githubusercontent.com/kevinlangleyjr/dotfiles/main/install.sh | bash -s
 ```
 
 If `~/.dotfiles` already exists and is a git checkout, the script skips cloning.
 
 ### Environment variables
 
-| Variable   | Meaning                                                                                                   |
-| ---------- | --------------------------------------------------------------------------------------------------------- |
-| `DOTFILES` | Directory to use as the dotfiles repo (default: git root when running from disk, otherwise `~/.dotfiles`) |
-| `REPO_URL` | Git URL to clone when `DOTFILES` has no `.git` directory (required in that case)                          |
+| Variable   | Meaning                                                                                                                                                  |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DOTFILES` | Directory to use as the dotfiles repo (default: git root when running from disk, otherwise `~/.dotfiles`)                                                |
+| `REPO_URL` | Git URL to clone when `DOTFILES` has no `.git` directory (defaults to `git@github.com:kevinlangleyjr/dotfiles.git`; override if you use HTTPS or a fork) |
 
 ## What the installer links
 

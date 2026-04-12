@@ -3,11 +3,11 @@
 #
 # Environment:
 #   DOTFILES   Target directory (default: repo root when run from disk, else ~/.dotfiles)
-#   REPO_URL   Git clone URL — required when the target has no .git yet
+#   REPO_URL   Override clone URL (default: SSH — requires GitHub SSH keys; set when you fork)
 #
 # Local:     ./install.sh
-# Remote:    curl -fsSL https://raw.githubusercontent.com/<user>/<repo>/main/install.sh | bash -s
-#            REPO_URL='https://github.com/<user>/<repo>.git' curl -fsSL … | bash -s
+# Remote:    curl -fsSL https://raw.githubusercontent.com/kevinlangleyjr/dotfiles/main/install.sh | bash -s
+DEFAULT_REPO_URL='git@github.com:kevinlangleyjr/dotfiles.git'
 set -euo pipefail
 
 resolve_dotfiles_dir() {
@@ -29,11 +29,9 @@ resolve_dotfiles_dir() {
 
 DOTFILES_DIR="$(resolve_dotfiles_dir)"
 
+REPO_URL="${REPO_URL:-$DEFAULT_REPO_URL}"
+
 if [[ ! -d "$DOTFILES_DIR/.git" ]]; then
-	if [[ -z "${REPO_URL:-}" ]]; then
-		echo "install: set REPO_URL to your dotfiles repository URL (git clone)." >&2
-		exit 1
-	fi
 	if [[ -e "$DOTFILES_DIR" ]] && [[ ! -d "$DOTFILES_DIR/.git" ]]; then
 		echo "install: $DOTFILES_DIR exists but is not a git clone; remove it or set DOTFILES." >&2
 		exit 1
