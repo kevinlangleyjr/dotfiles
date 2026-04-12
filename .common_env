@@ -1,0 +1,57 @@
+unsetopt correct_all
+setopt no_aliases
+
+setopt aliases
+
+## OSX
+alias f="open"
+
+## ZSHMARKS
+alias j="nocorrect jump"
+alias s="nocorrect bookmark"
+alias d="nocorrect deletemark"
+alias p="nocorrect showmarks"
+
+## EDITOR
+alias q="code -w"
+
+## GIT ALIASES
+alias g="git"
+alias gdq="gd | q -"
+alias gma="git commit -a -m"
+alias gcb="gco -b"
+alias gcl="g clone"
+alias gam="g commit -a --amend"
+alias gt="g tag"
+alias gta="gt -a"
+alias gpo="g push origin"
+alias gpt="g push --tags"
+
+## PIPE ALIASES
+alias -g L='|less'
+alias -g G='|ag'
+alias -g T='|tail'
+alias -g H='|head'
+alias -g W='|wc -l'
+alias -g S='|sort'
+
+## MISC ALIASES
+alias code.="code ."
+
+## MISSPELLED COMMAND ALIASES
+alias yarm='yarn'
+alias gk='git pull'
+alias gkl='git pull'
+
+function killPort {
+	sudo lsof -t -i tcp:$1 | while read pid; do kill -9 $pid; done
+	if (( $? == 0 )); then; echo 'Killed'; else; echo "Can not find process at port $1"; fi
+}
+
+export EDITOR="code"
+
+case "$(uname -s)" in
+	Darwin) [[ -r "$HOME/.macos_env" ]] && source "$HOME/.macos_env" ;;
+	Linux)  [[ -r "$HOME/.linux_env" ]] && source "$HOME/.linux_env" ;;
+esac
+
