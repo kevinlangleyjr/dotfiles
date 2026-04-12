@@ -45,19 +45,21 @@ If `~/.dotfiles` already exists and is a git checkout, the script skips cloning.
 
 ### Environment variables
 
-| Variable   | Meaning                                                                                                                                                  |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DOTFILES` | Directory to use as the dotfiles repo (default: git root when running from disk, otherwise `~/.dotfiles`)                                                |
-| `REPO_URL` | Git URL to clone when `DOTFILES` has no `.git` directory (defaults to `git@github.com:kevinlangleyjr/dotfiles.git`; override if you use HTTPS or a fork) |
+| Variable               | Meaning                                                                                                                                                                                                                                       |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DOTFILES`             | Directory to use as the dotfiles repo (default: git root when running from disk, otherwise `~/.dotfiles`)                                                                                                                                     |
+| `REPO_URL`             | Git URL to clone when `DOTFILES` has no `.git` directory (defaults to `git@github.com:kevinlangleyjr/dotfiles.git`; override if you use HTTPS or a fork)                                                                                      |
+| `INSTALL_GIT_DOTFILES` | `yes` / `no` — whether to link `~/.gitconfig` and `~/.gitignore_global`. When unset and your terminal is interactive, the script **asks**; when stdin isn’t a TTY (e.g. some CI), it defaults to **yes** so existing one-liners keep working. |
+
+You can also pass **`--no-git`** or **`--git`** to `install.sh` instead of using the variable.
 
 ## What the installer links
 
 Symlinks are created in `$HOME` pointing at the repo:
 
-- `.gitconfig`
-- `.gitignore_global`
-- `.common_env`
-- `.macos_env` on Darwin, or `.linux_env` on Linux
+- **Optional (prompt or `INSTALL_GIT_DOTFILES` / `--git` / `--no-git`):** `.gitconfig`, `.gitignore_global` — existing files are moved to `.gitconfig.old` / `.gitignore_global.old` (and a prior `.old` is shifted to `.old.bak`) before linking, unless the home file is already a symlink to this repo’s copy
+- **Always:** `.common_env`
+- **Always (OS-specific):** `.macos_env` on Darwin, or `.linux_env` on Linux
 
 After it runs, follow the printed instructions to wire **`~/.common_env`** and **PATH** into `~/.zshrc`, then restart the shell or `source ~/.zshrc`.
 
