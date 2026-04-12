@@ -2,13 +2,66 @@
 # Dotfiles installer
 #
 # Environment:
-#   DOTFILES   Target directory (default: repo root when run from disk, else ~/.dotfiles)
-#   REPO_URL   Override clone URL (default: SSH — requires GitHub SSH keys; set when you fork)
+#   DOTFILES              Target directory (default: repo root when run from disk, else ~/.dotfiles)
+#   REPO_URL              Override clone URL (default: SSH — requires GitHub SSH keys; set when you fork)
+#   INSTALL_GIT_DOTFILES  yes/no — link .gitconfig and .gitignore_global (skips prompt when set)
 #
-# Local:     ./install.sh
+# Flags:  --git       link Git config files (non-interactive)
+#         --no-git    skip Git config files (non-interactive)
+#
+# Local:     ./install.sh [--git|--no-git]
 # Remote:    curl -fsSL https://raw.githubusercontent.com/kevinlangleyjr/dotfiles/main/install.sh | bash -s
 DEFAULT_REPO_URL='git@github.com:kevinlangleyjr/dotfiles.git'
 set -euo pipefail
+
+for _arg in "$@"; do
+	case "$_arg" in
+		--git) INSTALL_GIT_DOTFILES=yes ;;
+		--no-git) INSTALL_GIT_DOTFILES=no ;;
+	esac
+done
+
+want_git_dotfiles() {
+	local reply
+	case "${INSTALL_GIT_DOTFILES:-}" in
+		[yY] | [yY][eE][sS] | 1 | true) return 0 ;;
+		[nN] | [nN][oO] | 0 | false) return 1 ;;
+	esac
+	if [[ ! -r /dev/tty ]]; then
+		return 0
+	fi
+	read -r -p "Link Git config (.gitconfig) and ~/.gitignore_global? [Y/n] " reply </dev/tty || reply=y
+	case "${reply:-y}" in
+		[nN] | [nN][oO]) return 1 ;;
+		*) return 0 ;;
+	esac
+}
+
+# If a Git dotfile already exists and is not already our symlink, move it aside as <name>.old
+move_existing_git_dotfile_to_old() {
+	local home_path=$1
+	local repo_path=$2
+	local name
+	name=$(basename "$home_path")
+
+	if [[ -L "$home_path" ]]; then
+		local cur
+		cur=$(readlink "$home_path")
+		if [[ "$cur" == "$repo_path" ]]; then
+			return 0
+		fi
+	fi
+	if [[ ! -e "$home_path" && ! -L "$home_path" ]]; then
+		return 0
+	fi
+	local bak="${home_path}.old"
+	if [[ -e "$bak" || -L "$bak" ]]; then
+		mv -f "$bak" "${bak}.bak"
+		echo "install: existing ${name}.old moved to ${name}.old.bak" >&2
+	fi
+	mv "$home_path" "$bak"
+	echo "install: previous ${name} moved to ${name}.old" >&2
+}
 
 resolve_dotfiles_dir() {
 	if [[ -n "${DOTFILES:-}" ]]; then
@@ -39,8 +92,15 @@ if [[ ! -d "$DOTFILES_DIR/.git" ]]; then
 	git clone "$REPO_URL" "$DOTFILES_DIR"
 fi
 
-ln -sf "$DOTFILES_DIR/.gitconfig" "$HOME/.gitconfig"
-ln -sf "$DOTFILES_DIR/.gitignore_global" "$HOME/.gitignore_global"
+if want_git_dotfiles; then
+	move_existing_git_dotfile_to_old "$HOME/.gitconfig" "$DOTFILES_DIR/.gitconfig"
+	move_existing_git_dotfile_to_old "$HOME/.gitignore_global" "$DOTFILES_DIR/.gitignore_global"
+	ln -sf "$DOTFILES_DIR/.gitconfig" "$HOME/.gitconfig"
+	ln -sf "$DOTFILES_DIR/.gitignore_global" "$HOME/.gitignore_global"
+else
+	echo "install: skipped ~/.gitconfig and ~/.gitignore_global" >&2
+fi
+
 ln -sf "$DOTFILES_DIR/.common_env" "$HOME/.common_env"
 
 case "$(uname -s)" in
