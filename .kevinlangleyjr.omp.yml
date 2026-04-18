@@ -21,7 +21,7 @@ blocks:
         style: powerline
         template: " {{ .Path}} "
         type: path
-      - background: "#fffb38"
+      - background: "#38bdf8"
         background_templates:
           - "{{ if or (.Working.Changed) (.Staging.Changed) }}#fb7185{{ end }}"
           - "{{ if and (gt .Ahead 0) (gt .Behind 0) }}#ff4500{{ end }}"
