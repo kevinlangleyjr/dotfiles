@@ -17,3 +17,7 @@ if [ -d "$HOME/.local/bin" ] && [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
 fi
 
 eval "$(oh-my-posh init zsh --config ~/.kevinlangleyjr.omp.yml)"
+
+if command -v fastfetch >/dev/null 2>&1; then
+	fastfetch
+fi

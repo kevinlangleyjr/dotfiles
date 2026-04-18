@@ -1,3 +1,5 @@
+#!/bin/zsh
+
 unsetopt correct_all
 setopt no_aliases
 
@@ -7,7 +9,7 @@ setopt aliases
 alias f="open"
 
 ## GENERAL
-alias ll="ls -la"
+alias ll="ls -laG"
 
 ## EDITOR
 alias q="code -w"
