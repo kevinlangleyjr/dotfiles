@@ -9,6 +9,14 @@ blocks:
         style: diamond
         template: " {{.Icon}} "
         type: os
+      - background: "#334155"
+        foreground: "#e2e8f0"
+        powerline_symbol: 
+        properties:
+          ssh_only: true
+        style: powerline
+        template: "{{ if .SSHSession }}  {{ .HostName }} {{ end }}"
+        type: session
       - background: "#1e293b"
         foreground: "#5eead4"
         powerline_symbol: 
@@ -86,7 +94,7 @@ blocks:
         powerline_symbol: 
         properties:
           charged_icon: " "
-          charging_icon: " "
+          charging_icon: " "
           discharging_icon: " "
           not_charging_icon: 
         style: powerline
