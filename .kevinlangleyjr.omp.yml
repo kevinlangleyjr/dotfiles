@@ -76,7 +76,7 @@ blocks:
           always_enabled: true
           style: austin
         style: plain
-        template: " 羽{{ .FormattedMs }} "
+        template: "  {{ .FormattedMs }} "
         type: executiontime
       - background: "#0e7490"
         background_templates:
@@ -104,7 +104,7 @@ blocks:
         style: diamond
         template: >-
           RAM: {{ (div ((sub .PhysicalTotalMemory .PhysicalFreeMemory)|float64)
-          1000000000.0) }}/{{ (div .PhysicalTotalMemory 1000000000.0) }}GB {{ " " }}
+          1000000000.0) }}/{{ (div .PhysicalTotalMemory 1000000000.0) }}GB {{ " " }}
         type: sysinfo
       - background: "#1e293b"
         foreground: "#5eead4"
@@ -113,7 +113,7 @@ blocks:
         properties:
           time_format: "3:04 PM"
         style: powerline
-        template: "  {{ .CurrentDate | date .Format }} "
+        template: "  {{ .CurrentDate | date .Format }} "
         type: time
     type: prompt
   - alignment: left
