@@ -5,6 +5,12 @@ setopt no_aliases
 
 setopt aliases
 
+# Initialize the completion system
+autoload -Uz compinit && compinit
+
+# Case-insensitive matching: lowercase matches uppercase
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+
 ## OS
 alias f="open"
 
