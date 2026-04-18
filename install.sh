@@ -103,6 +103,15 @@ fi
 
 ln -sf "$DOTFILES_DIR/.common_env" "$HOME/.common_env"
 
+SLATEWAVE_OMP_DIR="$HOME/.config/oh-my-posh/slatewave-omp"
+SLATEWAVE_OMP_URL="${SLATEWAVE_OMP_URL:-git@github.com:kevinlangleyjr/slatewave-omp.git}"
+if [[ ! -d "$SLATEWAVE_OMP_DIR/.git" ]]; then
+	mkdir -p "$(dirname "$SLATEWAVE_OMP_DIR")"
+	git clone "$SLATEWAVE_OMP_URL" "$SLATEWAVE_OMP_DIR"
+else
+	echo "install: slatewave-omp already present at $SLATEWAVE_OMP_DIR" >&2
+fi
+
 case "$(uname -s)" in
 	Darwin) ln -sf "$DOTFILES_DIR/.macos_env" "$HOME/.macos_env" ;;
 	Linux) ln -sf "$DOTFILES_DIR/.linux_env" "$HOME/.linux_env" ;;
