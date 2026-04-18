@@ -3,20 +3,25 @@ setopt no_aliases
 
 setopt aliases
 
-## OSX
+## OS
 alias f="open"
 
-## ZSHMARKS
-alias j="nocorrect jump"
-alias s="nocorrect bookmark"
-alias d="nocorrect deletemark"
-alias p="nocorrect showmarks"
+## GENERAL
+alias ll="ls -la"
 
 ## EDITOR
 alias q="code -w"
 
 ## GIT ALIASES
 alias g="git"
+alias gd="g diff"
+alias ga="g add"
+alias gl="g pull"
+alias gm="g merge"
+alias gb="g branch"
+alias gbsu="gb --set-upstream-to"
+alias gst="g status"
+alias gco="g checkout"
 alias gdq="gd | q -"
 alias gma="git commit -a -m"
 alias gcb="gco -b"
@@ -24,8 +29,9 @@ alias gcl="g clone"
 alias gam="g commit -a --amend"
 alias gt="g tag"
 alias gta="gt -a"
-alias gpo="g push origin"
-alias gpt="g push --tags"
+alias gp="g push"
+alias gpo="gp origin"
+alias gpt="gp --tags"
 
 ## PIPE ALIASES
 alias -g L='|less'
@@ -40,7 +46,6 @@ alias code.="code ."
 
 ## MISSPELLED COMMAND ALIASES
 alias yarm='yarn'
-alias gk='git pull'
 alias gkl='git pull'
 
 function killPort {

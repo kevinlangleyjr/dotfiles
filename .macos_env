@@ -1,1 +1,9 @@
 export CLAUDE_1P_DEV_ENV_ID=""
+
+## ZSHMARKS
+source ~/.zshrc.d/plugins/zsh-z/zsh-z.plugin.zsh
+
+alias j="nocorrect z"
+alias s="nocorrect z --add"
+alias d="nocorrect z -x"
+alias p="nocorrect x -l"
