@@ -18,6 +18,8 @@ fi
 
 eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/slatewave-omp/slatewave.omp.yml)"
 
+eval "$(zoxide init zsh)"
+
 if command -v fastfetch >/dev/null 2>&1; then
 	fastfetch
 fi
