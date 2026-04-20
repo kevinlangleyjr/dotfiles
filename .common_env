@@ -56,6 +56,25 @@ alias code.="code ."
 alias yarm='yarn'
 alias gkl='git pull'
 
+## RAINBOW / BANNER ALIASES (figlet + lolcat)
+# Only define if the tools are installed.
+if command -v lolcat >/dev/null 2>&1; then
+	alias lol='lolcat'                                                    # cmd | lol
+	alias lola='lolcat -a -d 2'                                           # animated rainbow
+	alias glog='git log --oneline --decorate --graph --all | lolcat'
+	alias llr='ls -lah | lolcat'
+fi
+
+if command -v figlet >/dev/null 2>&1 && command -v lolcat >/dev/null 2>&1; then
+	# Rainbow ASCII text in three sizes, ordered small -> large:
+	label() { figlet -f small "$@" | lolcat; }   # inline sub-heading
+	title() { figlet -f shadow "$@" | lolcat; }  # formal section title
+	hero()  { figlet -f slant "$@" | lolcat; }   # flagship banner
+	alias win='figlet -f shadow WIN | lolcat'
+	alias nope='figlet -f slant NOPE | lolcat'
+	alias morning='figlet -f slant "Good Morning, Kevin" | lolcat'
+fi
+
 function killPort {
 	sudo lsof -t -i tcp:$1 | while read pid; do kill -9 $pid; done
 	if (( $? == 0 )); then; echo 'Killed'; else; echo "Can not find process at port $1"; fi
