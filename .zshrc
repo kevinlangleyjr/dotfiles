@@ -23,3 +23,8 @@ eval "$(zoxide init zsh)"
 if command -v fastfetch >/dev/null 2>&1; then
 	fastfetch
 fi
+
+export PATH="/opt/homebrew/opt/go@1.21/bin:$PATH"
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
