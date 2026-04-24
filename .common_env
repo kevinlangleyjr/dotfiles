@@ -84,6 +84,18 @@ function killPort {
 	if (( $? == 0 )); then; echo 'Killed'; else; echo "Can not find process at port $1"; fi
 }
 
+# Pull latest dotfiles. Override with DOTFILES_DIR (default: ~/.dotfiles).
+function updateDotfiles {
+	local dir="${DOTFILES_DIR:-$HOME/.dotfiles}"
+	if [[ ! -d "$dir" ]]; then
+		echo "updateDotfiles: directory not found: $dir" >&2
+		return 1
+	fi
+	(
+		cd "$dir" && git pull
+	)
+}
+
 export EDITOR="code"
 
 case "$(uname -s)" in
