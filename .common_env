@@ -15,7 +15,11 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 alias f="open"
 
 ## GENERAL
-alias ll="ls -laG"
+if command -v lsd >/dev/null 2>&1; then
+	alias ll="lsd -la"
+else
+	alias ll="ls -la --color"
+fi
 
 ## EDITOR
 alias q="code -w"
