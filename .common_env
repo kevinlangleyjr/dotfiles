@@ -21,6 +21,10 @@ else
 	alias ll="ls -la --color"
 fi
 
+alias ..="cd ../"
+alias ...="cd ../../"
+alias ....="cd ../../../"
+
 ## EDITOR
 alias q="code -w"
 
