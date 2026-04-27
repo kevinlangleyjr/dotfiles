@@ -28,3 +28,13 @@ export PATH="/opt/homebrew/opt/go@1.21/bin:$PATH"
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+
+# pnpm
+export PNPM_HOME="$HOME/.local/share/pnpm"
+if [ -d "$PNPM_HOME" ]; then
+	case ":$PATH:" in
+		*":$PNPM_HOME:"*) ;;
+		*) export PATH="$PNPM_HOME:$PATH" ;;
+	esac
+fi
+# pnpm end
