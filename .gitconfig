@@ -104,3 +104,9 @@
 
 [url "git://gist.github.com/"]
 	insteadOf = gist:
+
+[includeIf "gitdir:~/Development/1P/"]
+	path = ~/.gitconfig-agilebits
+
+[includeIf "gitdir:~/go/src/go.1password.io/"]
+	path = ~/.gitconfig-agilebits
