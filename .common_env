@@ -69,7 +69,7 @@ alias gpt="gp --tags"
 
 ## PIPE ALIASES
 alias -g L='|less'
-alias -g G='|ag'
+alias -g G='|rg'
 alias -g T='|tail'
 alias -g H='|head'
 alias -g W='|wc -l'
