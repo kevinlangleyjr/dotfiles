@@ -3,5 +3,7 @@ export PATH="/opt/homebrew/opt/go/libexec/bin:$PATH"
 
 ## OS COMMANDS
 alias f="open"
+alias copy="pbcopy"
+alias paste="pbpaste"
 
 source ~/.1P
