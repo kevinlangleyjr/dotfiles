@@ -1,0 +1,6 @@
+.DS_Store
+.idea/
+.vscode/
+*.local
+*.swp
+*.swo
