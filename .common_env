@@ -106,6 +106,7 @@ alias -g S='|sort'
 
 ## SHELL HYGIENE
 alias reload='exec zsh -l'
+alias path='echo $PATH | tr ":" "\n" | nl'
 
 ## MISC ALIASES
 alias code.="code ."
