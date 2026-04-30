@@ -1,8 +1,21 @@
 [init]
 	defaultBranch = main
+
 [user]
+	name = Kevin Langley Jr.
 	email = me@kevinlangleyjr.dev
-	name = Kevin Langley Jr
+	signingKey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRoiFWS1boIQpfZVIWfBwHLdwPqll48l5DA4caovw7R
+
+[commit]
+	gpgSign = true
+
+[gpg]
+	program = /usr/local/bin/gpg
+	format = ssh
+
+[gpg "ssh"]
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+
 [core]
 	autocrlf = input
 	whitespace = fix,space-before-tab,tab-in-indent,trailing-space
