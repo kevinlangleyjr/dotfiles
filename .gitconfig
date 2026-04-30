@@ -86,6 +86,9 @@
 	default = current
 	autoSetupRemote = true
 
+[tag]
+	forceSignAnnotated = false
+
 [difftool "vscode"]
 	cmd = code --wait --diff $LOCAL $REMOTE
 
@@ -117,6 +120,18 @@
 
 [url "git://gist.github.com/"]
 	insteadOf = gist:
+
+[url "git@gitlab.1password.io:"]
+	insteadOf = https://gitlab.1password.io/
+
+[url "ssh://git@ssh.gitlab.1password.io:2227"]
+	insteadOf = https://gitlab.1password.io
+
+[url "git@github-enterprise:agilebits-inc/"]
+	insteadOf = https://github.com/agilebits-inc/
+
+[url "git@github-enterprise:agilebits-inc/"]
+	insteadOf = git@github.com:agilebits-inc/
 
 [includeIf "gitdir:~/Development/1P/"]
 	path = ~/.gitconfig-agilebits
