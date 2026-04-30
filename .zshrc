@@ -26,9 +26,19 @@ if [ -f ~/.common_env ]; then
 	. ~/.common_env
 fi
 
+# Lazy-load nvm: defer the ~300ms nvm.sh source until first nvm/node/npm/npx call.
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+	_load_nvm() {
+		unset -f nvm node npm npx _load_nvm
+		\. "$NVM_DIR/nvm.sh"
+		[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+	}
+	nvm()  { _load_nvm; nvm "$@"; }
+	node() { _load_nvm; node "$@"; }
+	npm()  { _load_nvm; npm "$@"; }
+	npx()  { _load_nvm; npx "$@"; }
+fi
 
 eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/slatewave-omp/slatewave.omp.yml)"
 
