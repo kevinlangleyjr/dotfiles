@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# bak — copy a file or directory to <name>.bak.YYYY-MM-DD-HHMMSS in place.
+set -euo pipefail
+
+if [[ $# -ne 1 ]]; then
+	echo "usage: bak <file-or-dir>" >&2
+	exit 2
+fi
+
+src=$1
+
+if [[ ! -e "$src" ]]; then
+	echo "bak: $src does not exist" >&2
+	exit 1
+fi
+
+ts=$(date +%Y-%m-%d-%H%M%S)
+dst="${src}.bak.${ts}"
+
+cp -a "$src" "$dst"
+echo "$dst"
