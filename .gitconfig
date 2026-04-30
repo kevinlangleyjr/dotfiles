@@ -61,15 +61,23 @@
 
 [diff]
 	tool = vscode
+	colorMoved = default
+
+[fetch]
+	prune = true
+
+[log]
+	date = iso
+
+[push]
+	default = current
+	autoSetupRemote = true
 
 [difftool "vscode"]
 	cmd = code --wait --diff $LOCAL $REMOTE
 
 [rerere]
 	enabled = 1
-
-[push]
-	default = current
 
 [filter "lfs"]
 	clean = git-lfs clean %f
