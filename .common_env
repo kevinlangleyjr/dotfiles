@@ -1,9 +1,4 @@
-#!/bin/zsh
-
 unsetopt correct_all
-setopt no_aliases
-
-setopt aliases
 
 # Initialize the completion system
 autoload -Uz compinit && compinit
@@ -17,8 +12,10 @@ alias f="open"
 ## GENERAL
 if command -v lsd >/dev/null 2>&1; then
 	alias ll="lsd -la"
+elif ls --color=auto / >/dev/null 2>&1; then
+	alias ll="ls -la --color=auto"   # GNU coreutils
 else
-	alias ll="ls -la --color"
+	alias ll="ls -laG"               # BSD/macOS
 fi
 
 alias ..="cd ../"
