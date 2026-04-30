@@ -101,6 +101,7 @@ After it runs, restart the shell or `source ~/.zshrc`.
 | `whichall <cmd>`         | Lists every executable matching `<cmd>` across `$PATH`, not just the first. Useful for PATH conflicts (brew vs nvm, etc.). |
 | `portcheck <port>`       | Read-only counterpart to `killport`: prints what's listening on a TCP port (no `sudo` needed for your own processes).      |
 | `git-cleanup`            | Fetches with `--prune`, then prompts to delete (a) local branches whose upstream is gone and (b) local branches fully merged into the default branch. |
+| `dotfiles-doctor`        | Verifies the install: every symlink points at the repo, `~/.zshrc.local` exists, slatewave-omp cloned, `~/.local/bin` on PATH, every `bin/` script linked, every Brewfile tool present. Run after a fresh-machine install. |
 
 `.common_env` keeps `killPort` / `updateDotfiles` aliases pointed at these for muscle-memory continuity.
 
