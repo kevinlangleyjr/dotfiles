@@ -9,3 +9,4 @@ lolcat
 figlet
 ripgrep
 git-delta
+direnv
