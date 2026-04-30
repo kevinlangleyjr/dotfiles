@@ -99,10 +99,12 @@ fi
 if want_git_dotfiles; then
 	move_existing_to_old "$HOME/.gitconfig" "$DOTFILES_DIR/.gitconfig"
 	move_existing_to_old "$HOME/.gitignore_global" "$DOTFILES_DIR/.gitignore_global"
+	move_existing_to_old "$HOME/.gitconfig-agilebits" "$DOTFILES_DIR/.gitconfig-agilebits"
 	ln -sf "$DOTFILES_DIR/.gitconfig" "$HOME/.gitconfig"
 	ln -sf "$DOTFILES_DIR/.gitignore_global" "$HOME/.gitignore_global"
+	ln -sf "$DOTFILES_DIR/.gitconfig-agilebits" "$HOME/.gitconfig-agilebits"
 else
-	echo "install: skipped ~/.gitconfig and ~/.gitignore_global" >&2
+	echo "install: skipped ~/.gitconfig, ~/.gitignore_global, ~/.gitconfig-agilebits" >&2
 fi
 
 move_existing_to_old "$HOME/.zshrc" "$DOTFILES_DIR/.zshrc"
