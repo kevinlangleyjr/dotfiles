@@ -1,5 +1,8 @@
 export CLAUDE_1P_DEV_ENV_ID=""
 
+## macOS-only PATH
+export PATH="/opt/homebrew/opt/go/libexec/bin:$PATH"
+
 ## OS COMMANDS
 alias f="open"
 
