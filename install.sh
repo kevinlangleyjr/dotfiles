@@ -127,6 +127,14 @@ if [[ ! -e "$HOME/.zshrc.local" ]]; then
 	echo "install: created ~/.zshrc.local from template — edit it to set per-machine values" >&2
 fi
 
+# Symlink bin/ scripts into ~/.local/bin so they land on PATH (the .zshrc
+# already adds ~/.local/bin when it exists).
+mkdir -p "$HOME/.local/bin"
+for script in "$DOTFILES_DIR"/bin/*; do
+	[[ -f "$script" && -x "$script" ]] || continue
+	ln -sf "$script" "$HOME/.local/bin/$(basename "$script")"
+done
+
 cat <<'EOF'
 
 Dotfiles linked. Add the following to your ~/.zshrc (if not already present).

@@ -101,22 +101,9 @@ if command -v figlet >/dev/null 2>&1 && command -v lolcat >/dev/null 2>&1; then
 	alias morning='figlet -f slant "Good Morning, Kevin" | lolcat'
 fi
 
-function killPort {
-	sudo lsof -t -i tcp:$1 | while read pid; do kill -9 $pid; done
-	if (( $? == 0 )); then; echo 'Killed'; else; echo "Can not find process at port $1"; fi
-}
-
-# Pull latest dotfiles. Override with DOTFILES_DIR (default: ~/.dotfiles).
-function updateDotfiles {
-	local dir="${DOTFILES_DIR:-$HOME/.dotfiles}"
-	if [[ ! -d "$dir" ]]; then
-		echo "updateDotfiles: directory not found: $dir" >&2
-		return 1
-	fi
-	(
-		cd "$dir" && git pull
-	)
-}
+# Backwards-compat aliases for the old function names; real scripts in bin/.
+alias killPort='killport'
+alias updateDotfiles='dotfiles-update'
 
 export EDITOR="code"
 

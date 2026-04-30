@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Pull latest dotfiles. Override location with DOTFILES_DIR (default: ~/.dotfiles).
+set -euo pipefail
+
+dir="${DOTFILES_DIR:-$HOME/.dotfiles}"
+
+if [[ ! -d "$dir" ]]; then
+	echo "dotfiles-update: directory not found: $dir" >&2
+	exit 1
+fi
+
+cd "$dir"
+git pull
