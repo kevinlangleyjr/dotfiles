@@ -75,6 +75,7 @@ alias q="code -w"
 ## GIT ALIASES
 alias g="git"
 alias gd="g diff"
+alias gds="g diff --staged"
 alias ga="g add"
 alias gl="g pull"
 alias gm="g merge"
