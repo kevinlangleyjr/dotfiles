@@ -99,6 +99,7 @@ After it runs, restart the shell or `source ~/.zshrc`.
 | `dotfiles-update`        | `cd $DOTFILES_DIR && git pull`. `DOTFILES_DIR` defaults to `~/.dotfiles`.                                                  |
 | `bak <path>`             | Copies a file or directory to `<path>.bak.YYYY-MM-DD-HHMMSS` in place. Prints the new path.                                |
 | `whichall <cmd>`         | Lists every executable matching `<cmd>` across `$PATH`, not just the first. Useful for PATH conflicts (brew vs nvm, etc.). |
+| `portcheck <port>`       | Read-only counterpart to `killport`: prints what's listening on a TCP port (no `sudo` needed for your own processes).      |
 
 `.common_env` keeps `killPort` / `updateDotfiles` aliases pointed at these for muscle-memory continuity.
 

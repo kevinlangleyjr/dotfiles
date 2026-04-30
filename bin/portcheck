@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# portcheck — show what's listening on the given TCP port.
+# Read-only counterpart to killport. No sudo needed for processes you own.
+set -euo pipefail
+
+if [[ $# -ne 1 ]]; then
+	echo "usage: portcheck <port>" >&2
+	exit 2
+fi
+
+port=$1
+output=$(lsof -nP -iTCP:"$port" -sTCP:LISTEN 2>/dev/null || true)
+
+if [[ -z "$output" ]]; then
+	echo "portcheck: nothing listening on tcp:$port" >&2
+	exit 1
+fi
+
+echo "$output"
