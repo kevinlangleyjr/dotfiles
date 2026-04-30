@@ -1,3 +1,8 @@
+# Keep $path (and therefore $PATH) deduplicated. Anything that prepends
+# or appends from here on — this file, .common_env, .macos_env, ~/.1P,
+# ~/.zshrc.local — gets a free dedup on assignment.
+typeset -U path PATH
+
 # set PATH so it includes user's private bin if it exists
 if [ -d "$HOME/bin" ] && [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
 	PATH="$HOME/bin:$PATH"
