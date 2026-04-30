@@ -11,7 +11,8 @@ Personal shell and Git configuration for **macOS** and **Linux**, managed as a g
 | [`.macos_env`](.macos_env) / [`.linux_env`](.linux_env) | Per-OS environment (e.g. tool-specific IDs); sourced by `.common_env`                   |
 | [`.gitconfig`](.gitconfig)                              | Git user name, default branch, global ignore file path                                  |
 | [`.gitignore_global`](.gitignore_global)                | Patterns ignored by Git everywhere (`core.excludesFile`)                                |
-| [`.zshrc`](.zshrc)                                      | Example zsh entrypoint (Oh My Zsh, Powerlevel10k, nvm); **not** linked by the installer |
+| [`.zshrc`](.zshrc)                                      | Example zsh entrypoint (oh-my-posh + slatewave theme, zoxide, nvm); **not** linked by the installer |
+| [`.zshrc.local.example`](.zshrc.local.example)          | Template for per-machine values (e.g. `CLAUDE_1P_DEV_ENV_ID`); copy to `~/.zshrc.local`              |
 
 The installer **does not** overwrite `~/.zshrc`. It prints the snippets you should add so `~/.common_env` loads and `~/bin` / `~/.local/bin` are on `PATH`. You can copy ideas from the repo’s `.zshrc` or symlink it yourself if this machine should match the repo exactly.
 
@@ -65,7 +66,18 @@ After it runs, follow the printed instructions to wire **`~/.common_env`** and *
 
 ## Platform-specific env
 
-`.common_env` sources `~/.macos_env` or `~/.linux_env` based on `uname`. Keep machine-specific or sensitive values there and treat them like any secret-bearing file: avoid committing real secrets, or use a private branch / template file if you share the repo publicly.
+`.common_env` sources `~/.macos_env` or `~/.linux_env` based on `uname`. These hold OS-specific behavior (PATH bits, key bindings, OS-only commands). On macOS, `.macos_env` additionally sources `~/.1P` for 1Password-managed env (work-only; not part of this repo).
+
+## Per-machine values (`~/.zshrc.local`)
+
+After the OS env file, `.common_env` sources `~/.zshrc.local` if it exists. This file is **machine-local and gitignored** — put per-machine env vars, tokens, or one-off PATH bits here so they never get committed.
+
+```bash
+cp .zshrc.local.example ~/.zshrc.local
+# edit ~/.zshrc.local and fill in values
+```
+
+At minimum, set `CLAUDE_1P_DEV_ENV_ID` (get the value from your local 1P setup).
 
 ## License
 
