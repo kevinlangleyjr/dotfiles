@@ -49,6 +49,11 @@ eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/slatewave-omp/slatewav
 
 eval "$(zoxide init zsh)"
 
+# direnv hook — auto-loads/unloads .envrc files when changing directories.
+if command -v direnv >/dev/null 2>&1; then
+	eval "$(direnv hook zsh)"
+fi
+
 if command -v fastfetch >/dev/null 2>&1; then
 	fastfetch
 fi
