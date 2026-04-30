@@ -8,6 +8,14 @@
 	whitespace = fix,space-before-tab,tab-in-indent,trailing-space
 	editor = code --wait --new-window
 	excludesFile = ~/.gitignore_global
+	pager = delta
+
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	navigate = true
+	line-numbers = true
 
 [apply]
 	whitespace = fix
@@ -46,6 +54,7 @@
 [merge]
 	log = true
 	tool = vscode
+	conflictStyle = zdiff3
 
 [mergetool "vscode"]
 	cmd = code --wait $MERGED
