@@ -4,14 +4,6 @@ export PATH="/opt/homebrew/opt/go/libexec/bin:$PATH"
 ## OS COMMANDS
 alias f="open"
 
-## ZSHMARKS
-source ~/.zshrc.d/plugins/zsh-z/zsh-z.plugin.zsh
-
-alias j="nocorrect z"
-alias s="nocorrect z --add"
-alias d="nocorrect z -x"
-alias p="nocorrect x -l"
-
 autoload -U up-line-or-beginning-search
 autoload -U down-line-or-beginning-search
 zle -N up-line-or-beginning-search
