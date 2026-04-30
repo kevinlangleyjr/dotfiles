@@ -1,0 +1,11 @@
+# Tools the shell config expects to be available, on Linux.
+# Package names assume Debian/Ubuntu (apt). Adjust for your distro.
+# install.sh prints the recommended apt command on Linux but does not run it.
+
+zoxide
+fastfetch
+lsd
+lolcat
+figlet
+ripgrep
+git-delta
