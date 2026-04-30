@@ -1,0 +1,12 @@
+# Per-machine shell config (gitignored).
+#
+# Copy this file to ~/.zshrc.local and fill in machine-specific values.
+# Sourced from .common_env after the OS env file, so anything set here
+# overrides cross-platform and per-OS defaults.
+#
+#   cp .zshrc.local.example ~/.zshrc.local
+
+# 1Password / Claude dev environment ID — get this from your local 1P setup.
+# export CLAUDE_1P_DEV_ENV_ID=""
+
+# Any other per-machine env, aliases, or PATH bits go here.

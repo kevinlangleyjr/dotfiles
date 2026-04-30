@@ -101,3 +101,6 @@ case "$(uname -s)" in
 	Linux)  [[ -r "$HOME/.linux_env" ]] && source "$HOME/.linux_env" ;;
 esac
 
+# Per-machine values (gitignored). See .zshrc.local.example for the template.
+[[ -r "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+

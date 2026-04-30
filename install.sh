@@ -121,6 +121,12 @@ case "$(uname -s)" in
 		;;
 esac
 
+# Seed ~/.zshrc.local from the example if it doesn't exist yet.
+if [[ ! -e "$HOME/.zshrc.local" ]]; then
+	cp "$DOTFILES_DIR/.zshrc.local.example" "$HOME/.zshrc.local"
+	echo "install: created ~/.zshrc.local from template — edit it to set per-machine values" >&2
+fi
+
 cat <<'EOF'
 
 Dotfiles linked. Add the following to your ~/.zshrc (if not already present).
