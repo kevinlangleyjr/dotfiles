@@ -104,6 +104,9 @@ alias -g H='|head'
 alias -g W='|wc -l'
 alias -g S='|sort'
 
+## SHELL HYGIENE
+alias reload='exec zsh -l'
+
 ## MISC ALIASES
 alias code.="code ."
 
