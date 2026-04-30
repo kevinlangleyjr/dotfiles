@@ -37,6 +37,11 @@ alias ..="cd ../"
 alias ...="cd ../../"
 alias ....="cd ../../../"
 
+# Make a directory and immediately cd into it.
+mkcd() {
+	mkdir -p "$1" && cd "$1"
+}
+
 ## ZOXIDE (jump to frecent dirs; zoxide init lives in .zshrc)
 alias j='z'
 alias s='zoxide add'
