@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# git-cleanup — delete local branches whose upstream is gone, plus
+# (with confirmation) local branches fully merged into the default branch.
+set -euo pipefail
+
+if ! git rev-parse --git-dir >/dev/null 2>&1; then
+	echo "git-cleanup: not a git repo" >&2
+	exit 1
+fi
+
+# Resolve the default branch from origin/HEAD; fall back to "main".
+default_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || true)
+default_branch=${default_branch:-main}
+
+current=$(git symbolic-ref --short HEAD 2>/dev/null || echo "")
+
+echo "Fetching origin with --prune…"
+git fetch --prune origin
+
+# 1. Branches whose upstream was pruned (PR merged, branch deleted upstream)
+gone=()
+while IFS= read -r b; do
+	[[ -n "$b" ]] && gone+=("$b")
+done < <(git for-each-ref --format='%(refname:short) %(upstream:track)' refs/heads/ \
+	| awk '/\[gone\]/ {print $1}')
+
+echo
+echo "=== Branches with gone upstream ==="
+if [[ ${#gone[@]} -eq 0 ]]; then
+	echo "(none)"
+else
+	for b in "${gone[@]}"; do
+		echo "  $b"
+	done
+	echo
+	read -r -p "Force-delete these (-D, may discard unmerged commits)? [y/N] " reply
+	case "${reply:-n}" in
+		[yY] | [yY][eE][sS])
+			for b in "${gone[@]}"; do
+				if [[ "$b" == "$current" ]]; then
+					echo "  skipping $b (currently checked out)"
+					continue
+				fi
+				git branch -D "$b"
+			done
+			;;
+		*) echo "skipped" ;;
+	esac
+fi
+
+# 2. Branches fully merged into the default branch
+if ! git rev-parse --verify "$default_branch" >/dev/null 2>&1; then
+	echo
+	echo "(no local '$default_branch' branch — skipping merged-branch sweep)"
+	exit 0
+fi
+
+merged=()
+while IFS= read -r line; do
+	b=${line#"${line%%[![:space:]*]*}"}   # trim leading whitespace and the *
+	b=${b#\* }
+	[[ -z "$b" ]] && continue
+	[[ "$b" == "$default_branch" ]] && continue
+	[[ "$b" == "$current" ]] && continue
+	merged+=("$b")
+done < <(git branch --merged "$default_branch" 2>/dev/null)
+
+echo
+echo "=== Branches fully merged into $default_branch ==="
+if [[ ${#merged[@]} -eq 0 ]]; then
+	echo "(none)"
+else
+	for b in "${merged[@]}"; do
+		echo "  $b"
+	done
+	echo
+	read -r -p "Delete these merged branches? [y/N] " reply
+	case "${reply:-n}" in
+		[yY] | [yY][eE][sS])
+			for b in "${merged[@]}"; do
+				git branch -d "$b"
+			done
+			;;
+		*) echo "skipped" ;;
+	esac
+fi
