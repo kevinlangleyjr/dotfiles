@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+# dotfiles-doctor — verify the dotfiles install is wired up correctly.
+# Exits non-zero if any required check fails. Optional checks emit warnings.
+set -uo pipefail
+
+DOTFILES_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
+problems=0
+warnings=0
+
+if [[ -t 1 ]]; then
+	OK=$'\033[32m✓\033[0m'
+	WARN=$'\033[33m!\033[0m'
+	FAIL=$'\033[31m✗\033[0m'
+else
+	OK="OK"
+	WARN="WARN"
+	FAIL="FAIL"
+fi
+
+ok()   { printf '  %s  %s\n' "$OK"   "$*"; }
+warn() { printf '  %s  %s\n' "$WARN" "$*"; warnings=$((warnings + 1)); }
+fail() { printf '  %s  %s\n' "$FAIL" "$*"; problems=$((problems + 1)); }
+
+# Render an absolute path with $HOME shortened to ~.
+short() {
+	case "$1" in
+		"$HOME"/*) printf '~%s' "${1#"$HOME"}" ;;
+		*)         printf '%s' "$1" ;;
+	esac
+}
+
+# Resolve a symlink that should point at $DOTFILES_DIR/<rel>.
+# usage: check_link <home-path> <repo-rel> [optional]
+check_link() {
+	local home_path=$1
+	local repo_rel=$2
+	local optional=${3:-required}
+	local repo_path="$DOTFILES_DIR/$repo_rel"
+	local label
+	label="$(short "$home_path") → $repo_rel"
+
+	if [[ -L "$home_path" ]] && [[ "$(readlink "$home_path")" == "$repo_path" ]]; then
+		ok "$label"
+	elif [[ -e "$home_path" ]]; then
+		if [[ "$optional" == "optional" ]]; then
+			warn "$(short "$home_path") is a real file, not a symlink to $repo_rel"
+		else
+			fail "$(short "$home_path") exists but isn't a symlink to $repo_rel"
+		fi
+	else
+		if [[ "$optional" == "optional" ]]; then
+			warn "$(short "$home_path") not linked (optional)"
+		else
+			fail "$(short "$home_path") missing"
+		fi
+	fi
+}
+
+echo "Repo"
+if [[ -d "$DOTFILES_DIR/.git" ]]; then
+	ok "$DOTFILES_DIR is a git checkout"
+else
+	fail "$DOTFILES_DIR is not a git checkout (set DOTFILES_DIR or re-run install.sh)"
+fi
+
+echo
+echo "Required symlinks"
+check_link "$HOME/.zshrc"      .zshrc
+check_link "$HOME/.common_env" .common_env
+case "$(uname -s)" in
+	Darwin) check_link "$HOME/.macos_env" .macos_env ;;
+	Linux)  check_link "$HOME/.linux_env" .linux_env ;;
+esac
+
+echo
+echo "Optional symlinks (--git path)"
+check_link "$HOME/.gitconfig"           .gitconfig           optional
+check_link "$HOME/.gitignore_global"    .gitignore_global    optional
+check_link "$HOME/.gitconfig-agilebits" .gitconfig-agilebits optional
+
+echo
+echo "Per-machine state"
+if [[ -e "$HOME/.zshrc.local" ]]; then
+	ok "~/.zshrc.local present"
+else
+	warn "~/.zshrc.local missing — copy .zshrc.local.example"
+fi
+if [[ -d "$HOME/.config/oh-my-posh/slatewave-omp/.git" ]]; then
+	ok "slatewave-omp cloned"
+else
+	fail "slatewave-omp not cloned at ~/.config/oh-my-posh/slatewave-omp"
+fi
+
+echo
+echo "PATH"
+if [[ ":$PATH:" == *":$HOME/.local/bin:"* ]]; then
+	ok "~/.local/bin on PATH"
+else
+	fail "~/.local/bin not on PATH (start a fresh shell or source ~/.zshrc)"
+fi
+
+echo
+echo "bin/ scripts"
+for script in "$DOTFILES_DIR"/bin/*; do
+	[[ -f "$script" && -x "$script" ]] || continue
+	name=$(basename "$script")
+	target="$HOME/.local/bin/$name"
+	if [[ -L "$target" ]] && [[ "$(readlink "$target")" == "$script" ]]; then
+		ok "bin/$name linked"
+	else
+		fail "bin/$name not symlinked into ~/.local/bin/"
+	fi
+done
+
+echo
+echo "Brewed tools (from Brewfile)"
+for tool in oh-my-posh zoxide fastfetch lsd lolcat figlet rg delta; do
+	if command -v "$tool" >/dev/null 2>&1; then
+		ok "$tool"
+	else
+		warn "$tool not on PATH — run 'brew bundle --file=$DOTFILES_DIR/Brewfile'"
+	fi
+done
+
+echo
+if [[ $problems -eq 0 && $warnings -eq 0 ]]; then
+	printf '%s  all checks passed\n' "$OK"
+	exit 0
+elif [[ $problems -eq 0 ]]; then
+	printf '%s  %d warning(s), no failures\n' "$WARN" "$warnings"
+	exit 0
+else
+	printf '%s  %d problem(s), %d warning(s)\n' "$FAIL" "$problems" "$warnings"
+	exit 1
+fi
