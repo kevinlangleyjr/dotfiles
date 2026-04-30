@@ -9,7 +9,8 @@ Personal shell and Git configuration for **macOS** and **Linux**, managed as a g
 | [`install.sh`](install.sh)                              | Clones (if needed) and symlinks configs into `$HOME`                                    |
 | [`.common_env`](.common_env)                            | Shared zsh aliases, options, and functions (sourced from `~/.zshrc`)                    |
 | [`.macos_env`](.macos_env) / [`.linux_env`](.linux_env) | Per-OS environment (e.g. tool-specific IDs); sourced by `.common_env`                   |
-| [`.gitconfig`](.gitconfig)                              | Git user name, default branch, global ignore file path                                  |
+| [`.gitconfig`](.gitconfig)                              | Default Git identity + global config; uses `includeIf` to load `.gitconfig-agilebits` for 1P repo paths |
+| [`.gitconfig-agilebits`](.gitconfig-agilebits)          | Work identity overrides — applied via `includeIf` for `~/Development/1P/` and `~/go/src/go.1password.io/` |
 | [`.gitignore_global`](.gitignore_global)                | Patterns ignored by Git everywhere (`core.excludesFile`)                                |
 | [`.zshrc`](.zshrc)                                      | Zsh entrypoint (oh-my-posh + slatewave theme, zoxide, lazy nvm). Linked by the installer; an existing `~/.zshrc` is moved to `~/.zshrc.old` first |
 | [`.zshrc.local.example`](.zshrc.local.example)          | Template for per-machine values (e.g. `CLAUDE_1P_DEV_ENV_ID`); copy to `~/.zshrc.local`              |
@@ -66,7 +67,7 @@ If `~/.dotfiles` already exists and is a git checkout, the script skips cloning.
 | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `DOTFILES`             | Directory to use as the dotfiles repo (default: git root when running from disk, otherwise `~/.dotfiles`)                                                                                                                                     |
 | `REPO_URL`             | Git URL to clone when `DOTFILES` has no `.git` directory (defaults to `git@github.com:kevinlangleyjr/dotfiles.git`; override if you use HTTPS or a fork)                                                                                      |
-| `INSTALL_GIT_DOTFILES` | `yes` / `no` — whether to link `~/.gitconfig` and `~/.gitignore_global`. When unset and your terminal is interactive, the script **asks**; when stdin isn’t a TTY (e.g. some CI), it defaults to **yes** so existing one-liners keep working. |
+| `INSTALL_GIT_DOTFILES` | `yes` / `no` — whether to link `~/.gitconfig`, `~/.gitignore_global`, and `~/.gitconfig-agilebits`. When unset and your terminal is interactive, the script **asks**; when stdin isn’t a TTY (e.g. some CI), it defaults to **yes** so existing one-liners keep working. |
 
 You can also pass **`--no-git`** or **`--git`** to `install.sh` instead of using the variable.
 
@@ -74,7 +75,7 @@ You can also pass **`--no-git`** or **`--git`** to `install.sh` instead of using
 
 Symlinks created in `$HOME` pointing at the repo:
 
-- **Optional (prompt or `INSTALL_GIT_DOTFILES` / `--git` / `--no-git`):** `.gitconfig`, `.gitignore_global` — any pre-existing file is moved to `.<name>.old` (and a prior `.old` is shifted to `.old.bak`) before linking, unless it's already a symlink to this repo's copy
+- **Optional (prompt or `INSTALL_GIT_DOTFILES` / `--git` / `--no-git`):** `.gitconfig`, `.gitignore_global`, `.gitconfig-agilebits` — any pre-existing file is moved to `.<name>.old` (and a prior `.old` is shifted to `.old.bak`) before linking, unless it's already a symlink to this repo's copy
 - **Always:** `.zshrc`, `.common_env`
 - **Always (OS-specific):** `.macos_env` on Darwin, `.linux_env` on Linux
 
