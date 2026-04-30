@@ -6,4 +6,13 @@ alias f="open"
 alias copy="pbcopy"
 alias paste="pbpaste"
 
+# Use 1Password's SSH agent when it's running. Path is set unconditionally
+# in 1P's docs but we guard with [[ -S ]] so SSH falls back to the system
+# default on machines where the agent isn't active.
+_op_sock="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+if [[ -S "$_op_sock" ]]; then
+	export SSH_AUTH_SOCK="$_op_sock"
+fi
+unset _op_sock
+
 source ~/.1P
