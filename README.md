@@ -97,6 +97,7 @@ After it runs, restart the shell or `source ~/.zshrc`.
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
 | `killport <port>`        | Kills any process listening on the given TCP port. Requires `sudo`.                                                       |
 | `dotfiles-update`        | `cd $DOTFILES_DIR && git pull`. `DOTFILES_DIR` defaults to `~/.dotfiles`.                                                  |
+| `bak <path>`             | Copies a file or directory to `<path>.bak.YYYY-MM-DD-HHMMSS` in place. Prints the new path.                                |
 
 `.common_env` keeps `killPort` / `updateDotfiles` aliases pointed at these for muscle-memory continuity.
 
