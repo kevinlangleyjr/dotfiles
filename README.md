@@ -1,5 +1,7 @@
 # Dotfiles
 
+![](docs/hero.jpg)
+
 Personal shell and Git configuration for **macOS** and **Linux**, managed as a git repo and installed with a small symlink script.
 
 ## What’s in here
