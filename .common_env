@@ -52,6 +52,17 @@ cdr() {
 	cd "$root"
 }
 
+# cd up N levels (default 1). Generalises ../../...
+up() {
+	local n=${1:-1}
+	local p=""
+	local i
+	for ((i = 0; i < n; i++)); do
+		p="../$p"
+	done
+	cd "$p"
+}
+
 ## ZOXIDE (jump to frecent dirs; zoxide init lives in .zshrc)
 alias j='z'
 alias s='zoxide add'
