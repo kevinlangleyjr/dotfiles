@@ -11,16 +11,17 @@ Personal shell and Git configuration for **macOS** and **Linux**, managed as a g
 | [`.macos_env`](.macos_env) / [`.linux_env`](.linux_env) | Per-OS environment (e.g. tool-specific IDs); sourced by `.common_env`                   |
 | [`.gitconfig`](.gitconfig)                              | Git user name, default branch, global ignore file path                                  |
 | [`.gitignore_global`](.gitignore_global)                | Patterns ignored by Git everywhere (`core.excludesFile`)                                |
-| [`.zshrc`](.zshrc)                                      | Example zsh entrypoint (oh-my-posh + slatewave theme, zoxide, nvm); **not** linked by the installer |
+| [`.zshrc`](.zshrc)                                      | Zsh entrypoint (oh-my-posh + slatewave theme, zoxide, lazy nvm). Linked by the installer; an existing `~/.zshrc` is moved to `~/.zshrc.old` first |
 | [`.zshrc.local.example`](.zshrc.local.example)          | Template for per-machine values (e.g. `CLAUDE_1P_DEV_ENV_ID`); copy to `~/.zshrc.local`              |
-
-The installer **does not** overwrite `~/.zshrc`. It prints the snippets you should add so `~/.common_env` loads and `~/bin` / `~/.local/bin` are on `PATH`. You can copy ideas from the repo’s `.zshrc` or symlink it yourself if this machine should match the repo exactly.
+| [`bin/`](bin/)                                          | Standalone helper scripts (`killport`, `dotfiles-update`); installer symlinks each into `~/.local/bin` |
+| [`Brewfile`](Brewfile)                                  | macOS dependencies — installed by `install.sh` via `brew bundle` (skip with `--no-bootstrap`)         |
+| [`linux-packages.txt`](linux-packages.txt)              | Linux package list, advisory only — `install.sh` prints it but doesn't run apt for you               |
 
 ## Requirements
 
 - **Git** (clone / install)
 - **zsh** (configs assume zsh)
-- Optional: whatever your `~/.zshrc` references (e.g. [Oh My Zsh](https://ohmyz.sh/), [nvm](https://github.com/nvm-sh/nvm), editors used in aliases)
+- **Homebrew** on macOS so `install.sh` can run `brew bundle`. On Linux, install the packages from `linux-packages.txt` manually.
 
 ## Install
 
@@ -54,15 +55,23 @@ If `~/.dotfiles` already exists and is a git checkout, the script skips cloning.
 
 You can also pass **`--no-git`** or **`--git`** to `install.sh` instead of using the variable.
 
-## What the installer links
+## What the installer does
 
-Symlinks are created in `$HOME` pointing at the repo:
+Symlinks created in `$HOME` pointing at the repo:
 
-- **Optional (prompt or `INSTALL_GIT_DOTFILES` / `--git` / `--no-git`):** `.gitconfig`, `.gitignore_global` — existing files are moved to `.gitconfig.old` / `.gitignore_global.old` (and a prior `.old` is shifted to `.old.bak`) before linking, unless the home file is already a symlink to this repo’s copy
-- **Always:** `.common_env`
-- **Always (OS-specific):** `.macos_env` on Darwin, or `.linux_env` on Linux
+- **Optional (prompt or `INSTALL_GIT_DOTFILES` / `--git` / `--no-git`):** `.gitconfig`, `.gitignore_global` — any pre-existing file is moved to `.<name>.old` (and a prior `.old` is shifted to `.old.bak`) before linking, unless it's already a symlink to this repo's copy
+- **Always:** `.zshrc`, `.common_env`
+- **Always (OS-specific):** `.macos_env` on Darwin, `.linux_env` on Linux
 
-After it runs, follow the printed instructions to wire **`~/.common_env`** and **PATH** into `~/.zshrc`, then restart the shell or `source ~/.zshrc`.
+Plus:
+
+- Each executable in `bin/` symlinked into `~/.local/bin/`
+- `~/.zshrc.local` seeded from `.zshrc.local.example` if it doesn't exist
+- The `slatewave-omp` oh-my-posh theme cloned to `~/.config/oh-my-posh/slatewave-omp` if missing
+- macOS: `brew bundle` against the repo's `Brewfile` (unless `--no-bootstrap`)
+- Linux: prints the `linux-packages.txt` advisory list (unless `--no-bootstrap`)
+
+After it runs, restart the shell or `source ~/.zshrc`.
 
 ## Platform-specific env
 

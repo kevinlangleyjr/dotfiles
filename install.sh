@@ -41,8 +41,8 @@ want_git_dotfiles() {
 	esac
 }
 
-# If a Git dotfile already exists and is not already our symlink, move it aside as <name>.old
-move_existing_git_dotfile_to_old() {
+# If a dotfile already exists and is not already our symlink, move it aside as <name>.old
+move_existing_to_old() {
 	local home_path=$1
 	local repo_path=$2
 	local name
@@ -97,13 +97,16 @@ if [[ ! -d "$DOTFILES_DIR/.git" ]]; then
 fi
 
 if want_git_dotfiles; then
-	move_existing_git_dotfile_to_old "$HOME/.gitconfig" "$DOTFILES_DIR/.gitconfig"
-	move_existing_git_dotfile_to_old "$HOME/.gitignore_global" "$DOTFILES_DIR/.gitignore_global"
+	move_existing_to_old "$HOME/.gitconfig" "$DOTFILES_DIR/.gitconfig"
+	move_existing_to_old "$HOME/.gitignore_global" "$DOTFILES_DIR/.gitignore_global"
 	ln -sf "$DOTFILES_DIR/.gitconfig" "$HOME/.gitconfig"
 	ln -sf "$DOTFILES_DIR/.gitignore_global" "$HOME/.gitignore_global"
 else
 	echo "install: skipped ~/.gitconfig and ~/.gitignore_global" >&2
 fi
+
+move_existing_to_old "$HOME/.zshrc" "$DOTFILES_DIR/.zshrc"
+ln -sf "$DOTFILES_DIR/.zshrc" "$HOME/.zshrc"
 
 ln -sf "$DOTFILES_DIR/.common_env" "$HOME/.common_env"
 
@@ -160,23 +163,7 @@ fi
 
 cat <<'EOF'
 
-Dotfiles linked. Add the following to your ~/.zshrc (if not already present).
+Dotfiles linked. Restart the shell or run: source ~/.zshrc
 
---- common env (~/.common_env) ---
-if [ -f ~/.common_env ]; then
-	. ~/.common_env
-fi
-
---- PATH (~/bin and ~/.local/bin) ---
-# set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/bin" ] && [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
-	PATH="$HOME/bin:$PATH"
-fi
-
-# set PATH so it includes ~/.local/bin if it exists
-if [ -d "$HOME/.local/bin" ] && [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
-	PATH="$HOME/.local/bin:$PATH"
-fi
-
-Then restart the shell or run: source ~/.zshrc
+If you had a customized ~/.zshrc, it's been preserved at ~/.zshrc.old.
 EOF
