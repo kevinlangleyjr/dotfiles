@@ -42,6 +42,16 @@ mkcd() {
 	mkdir -p "$1" && cd "$1"
 }
 
+# cd to the current git repo's top-level.
+cdr() {
+	local root
+	root=$(git rev-parse --show-toplevel 2>/dev/null) || {
+		echo "cdr: not a git repo" >&2
+		return 1
+	}
+	cd "$root"
+}
+
 ## ZOXIDE (jump to frecent dirs; zoxide init lives in .zshrc)
 alias j='z'
 alias s='zoxide add'
