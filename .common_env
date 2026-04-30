@@ -12,6 +12,18 @@ fi
 # Case-insensitive matching: lowercase matches uppercase
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
+# Up/Down arrow searches history for entries starting with the current
+# input prefix, then moves cursor to end of line. Bind both terminfo
+# (application keypad mode) and the literal CSI/SS3 sequences so this
+# works under tmux, Ghostty, Terminal.app, etc.
+autoload -Uz history-search-end
+zle -N history-beginning-search-backward-end history-search-end
+zle -N history-beginning-search-forward-end history-search-end
+bindkey "$terminfo[kcuu1]" history-beginning-search-backward-end
+bindkey "$terminfo[kcud1]" history-beginning-search-forward-end
+bindkey "^[[A" history-beginning-search-backward-end
+bindkey "^[[B" history-beginning-search-forward-end
+
 ## GENERAL
 if command -v lsd >/dev/null 2>&1; then
 	alias ll="lsd -la"
