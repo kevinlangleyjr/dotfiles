@@ -1,5 +1,8 @@
 export CLAUDE_1P_DEV_ENV_ID=""
 
+## OS COMMANDS
+alias f="xdg-open"
+
 # Make zsh autocomplete with up arrow
 autoload -Uz history-search-end
 zle -N history-beginning-search-backward-end history-search-end

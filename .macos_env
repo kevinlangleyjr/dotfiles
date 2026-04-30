@@ -1,5 +1,8 @@
 export CLAUDE_1P_DEV_ENV_ID=""
 
+## OS COMMANDS
+alias f="open"
+
 ## ZSHMARKS
 source ~/.zshrc.d/plugins/zsh-z/zsh-z.plugin.zsh
 
