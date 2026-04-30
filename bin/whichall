@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# whichall — list every executable matching <command> across $PATH.
+# Useful for diagnosing PATH conflicts (brew node vs nvm node vs fnm node, etc.)
+set -euo pipefail
+
+if [[ $# -ne 1 ]]; then
+	echo "usage: whichall <command>" >&2
+	exit 2
+fi
+
+cmd=$1
+found=0
+
+IFS=':' read -ra path_dirs <<< "$PATH"
+for dir in "${path_dirs[@]}"; do
+	[[ -z "$dir" ]] && continue
+	candidate="$dir/$cmd"
+	if [[ -x "$candidate" && ! -d "$candidate" ]]; then
+		echo "$candidate"
+		found=$((found + 1))
+	fi
+done
+
+if [[ $found -eq 0 ]]; then
+	echo "whichall: $cmd not found on PATH" >&2
+	exit 1
+fi
