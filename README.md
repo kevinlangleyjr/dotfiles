@@ -17,6 +17,21 @@ Personal shell and Git configuration for **macOS** and **Linux**, managed as a g
 | [`Brewfile`](Brewfile)                                  | macOS dependencies — installed by `install.sh` via `brew bundle` (skip with `--no-bootstrap`)         |
 | [`linux-packages.txt`](linux-packages.txt)              | Linux package list, advisory only — `install.sh` prints it but doesn't run apt for you               |
 
+## Tools the shell expects
+
+These are pulled in by `Brewfile` on macOS (or `linux-packages.txt` on Linux). The shell config gracefully no-ops the optional ones, but the experience assumes they're present.
+
+| Tool                                       | What it's for                                                |
+| ------------------------------------------ | ------------------------------------------------------------ |
+| [oh-my-posh](https://ohmyposh.dev/)        | Prompt rendering engine; uses the `slatewave` theme          |
+| [zoxide](https://github.com/ajeetdsouza/zoxide)        | Frecency-ranked `cd`. Backs the `j` / `s` / `d` / `p` aliases. |
+| [fastfetch](https://github.com/fastfetch-cli/fastfetch) | System info splash on shell launch                          |
+| [lsd](https://github.com/lsd-rs/lsd)       | Modern `ls`; backs `ll`                                      |
+| [ripgrep](https://github.com/BurntSushi/ripgrep) | Faster `grep`; backs the global `\|G` alias              |
+| [git-delta](https://github.com/dandavison/delta) | Git diff pager (configured in `.gitconfig`)            |
+| `figlet`, `lolcat`                         | Banner / rainbow text helpers (`label`, `title`, `hero`, `morning`) |
+| [nvm](https://github.com/nvm-sh/nvm)       | Node version manager — lazy-loaded; install separately       |
+
 ## Requirements
 
 - **Git** (clone / install)
@@ -73,6 +88,17 @@ Plus:
 
 After it runs, restart the shell or `source ~/.zshrc`.
 
+## Helper scripts
+
+`bin/` contains standalone scripts; the installer symlinks each into `~/.local/bin/`, which `.zshrc` puts on `PATH`.
+
+| Command                  | What it does                                                                                                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `killport <port>`        | Kills any process listening on the given TCP port. Requires `sudo`.                                                       |
+| `dotfiles-update`        | `cd $DOTFILES_DIR && git pull`. `DOTFILES_DIR` defaults to `~/.dotfiles`.                                                  |
+
+`.common_env` keeps `killPort` / `updateDotfiles` aliases pointed at these for muscle-memory continuity.
+
 ## Platform-specific env
 
 `.common_env` sources `~/.macos_env` or `~/.linux_env` based on `uname`. These hold OS-specific behavior (PATH bits, key bindings, OS-only commands). On macOS, `.macos_env` additionally sources `~/.1P` for 1Password-managed env (work-only; not part of this repo).
@@ -87,6 +113,13 @@ cp .zshrc.local.example ~/.zshrc.local
 ```
 
 At minimum, set `CLAUDE_1P_DEV_ENV_ID` (get the value from your local 1P setup).
+
+## Troubleshooting
+
+- **Shell startup feels slow.** Profile with `time zsh -i -c exit`. The biggest contributors are usually `fastfetch` and the `nvm` lazy-load on first node invocation. The `compinit` cache rebuilds every 24h — `rm ~/.zcompdump*` forces a rebuild.
+- **`killport: command not found`.** `~/.local/bin` isn't on `PATH`. The `.zshrc` only adds it if the directory exists — re-run `./install.sh` to create it and link the bin scripts.
+- **Wrong git identity in a commit.** `git config --local user.email` overrides any `includeIf`. Check the local repo with `git config --show-origin user.email` to see which file is winning.
+- **`oh-my-posh: command not found` on first launch.** Brewfile didn't run, or the Brewfile bootstrap was skipped. Run `./install.sh` (or `brew bundle --file=~/.dotfiles/Brewfile` directly).
 
 ## License
 
