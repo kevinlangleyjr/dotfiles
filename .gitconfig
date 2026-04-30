@@ -9,9 +9,6 @@
 	editor = code --wait --new-window
 	excludesFile = ~/.gitignore_global
 
-[init]
-	defaultBranch = main
-
 [apply]
 	whitespace = fix
 
@@ -26,10 +23,6 @@
 	rb = rbranch
 	rv = review
 	st = status
-
-[branch "master"]
-	remote = origin
-	merge = refs/heads/master
 
 [color]
 	ui = auto
