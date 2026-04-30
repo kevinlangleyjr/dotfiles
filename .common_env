@@ -138,6 +138,32 @@ fi
 alias killPort='killport'
 alias updateDotfiles='dotfiles-update'
 
+# Extract any common archive type by sniffing the extension.
+extract() {
+	if [[ -z "${1:-}" ]]; then
+		echo "usage: extract <archive>" >&2
+		return 2
+	fi
+	if [[ ! -f "$1" ]]; then
+		echo "extract: $1 not a file" >&2
+		return 1
+	fi
+	case "$1" in
+		*.tar.gz | *.tgz)    tar -xzf "$1" ;;
+		*.tar.bz2 | *.tbz2)  tar -xjf "$1" ;;
+		*.tar.xz | *.txz)    tar -xJf "$1" ;;
+		*.tar.zst | *.tzst)  tar --zstd -xf "$1" ;;
+		*.tar)               tar -xf "$1" ;;
+		*.gz)                gunzip -k "$1" ;;
+		*.bz2)               bunzip2 -k "$1" ;;
+		*.xz)                unxz -k "$1" ;;
+		*.zip)               unzip "$1" ;;
+		*.7z)                7z x "$1" ;;
+		*.rar)               unrar x "$1" ;;
+		*) echo "extract: don't know how to handle $1" >&2; return 1 ;;
+	esac
+}
+
 export EDITOR="code"
 
 case "$(uname -s)" in
