@@ -6,18 +6,22 @@
 #   REPO_URL              Override clone URL (default: SSH — requires GitHub SSH keys; set when you fork)
 #   INSTALL_GIT_DOTFILES  yes/no — link .gitconfig and .gitignore_global (skips prompt when set)
 #
-# Flags:  --git       link Git config files (non-interactive)
-#         --no-git    skip Git config files (non-interactive)
+# Flags:  --git           link Git config files (non-interactive)
+#         --no-git        skip Git config files (non-interactive)
+#         --no-bootstrap  skip the Brewfile / linux-packages.txt step
 #
-# Local:     ./install.sh [--git|--no-git]
+# Local:     ./install.sh [--git|--no-git] [--no-bootstrap]
 # Remote:    curl -fsSL https://raw.githubusercontent.com/kevinlangleyjr/dotfiles/main/install.sh | bash -s
 DEFAULT_REPO_URL='git@github.com:kevinlangleyjr/dotfiles.git'
 set -euo pipefail
+
+BOOTSTRAP=yes
 
 for _arg in "$@"; do
 	case "$_arg" in
 		--git) INSTALL_GIT_DOTFILES=yes ;;
 		--no-git) INSTALL_GIT_DOTFILES=no ;;
+		--no-bootstrap) BOOTSTRAP=no ;;
 	esac
 done
 
@@ -134,6 +138,25 @@ for script in "$DOTFILES_DIR"/bin/*; do
 	[[ -f "$script" && -x "$script" ]] || continue
 	ln -sf "$script" "$HOME/.local/bin/$(basename "$script")"
 done
+
+# Bootstrap external tools the shell config expects (oh-my-posh, zoxide, etc).
+if [[ "$BOOTSTRAP" == "yes" ]]; then
+	case "$(uname -s)" in
+		Darwin)
+			if command -v brew >/dev/null 2>&1; then
+				echo "install: running brew bundle..." >&2
+				brew bundle --file="$DOTFILES_DIR/Brewfile"
+			else
+				echo "install: Homebrew not found; skipping Brewfile. Install brew from https://brew.sh and re-run." >&2
+			fi
+			;;
+		Linux)
+			echo "install: Linux bootstrap is advisory only. Recommended packages:" >&2
+			grep -v '^\s*#' "$DOTFILES_DIR/linux-packages.txt" | grep -v '^\s*$' | sed 's/^/  - /' >&2
+			echo "install: install them with your package manager, e.g. sudo apt install <pkg>..." >&2
+			;;
+	esac
+fi
 
 cat <<'EOF'
 
