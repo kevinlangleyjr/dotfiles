@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Kill whatever is listening on the given TCP port.
+set -euo pipefail
+
+if [[ $# -ne 1 ]]; then
+	echo "usage: killport <port>" >&2
+	exit 2
+fi
+
+port=$1
+pids=$(sudo lsof -t -i tcp:"$port" || true)
+
+if [[ -z "$pids" ]]; then
+	echo "killport: no process listening on tcp:$port" >&2
+	exit 1
+fi
+
+echo "$pids" | xargs sudo kill -9
+echo "killport: killed pid(s): $(echo "$pids" | tr '\n' ' ')"
