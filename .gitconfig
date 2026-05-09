@@ -13,8 +13,8 @@
 	program = /usr/local/bin/gpg
 	format = ssh
 
-[gpg "ssh"]
-	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+# gpg.ssh.program lives in OS-specific includes below — 1Password's
+# op-ssh-sign binary path differs per platform.
 
 [core]
 	autocrlf = input
@@ -138,3 +138,11 @@
 
 [includeIf "gitdir:~/go/src/go.1password.io/"]
 	path = ~/.gitconfig-agilebits
+
+# --- OS-specific overrides (e.g. 1Password op-ssh-sign path) ---
+
+[includeIf "gitdir:/Users/"]
+	path = ~/.gitconfig-os-macos
+
+[includeIf "gitdir:/home/"]
+	path = ~/.gitconfig-os-linux
