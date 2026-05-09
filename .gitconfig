@@ -146,3 +146,5 @@
 
 [includeIf "gitdir:/home/"]
 	path = ~/.gitconfig-os-linux
+[include]
+	path = /home/kevin/.config/delta-slatewave/slatewave.gitconfig
