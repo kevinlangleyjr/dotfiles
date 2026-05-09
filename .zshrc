@@ -45,8 +45,6 @@ if [ -s "$NVM_DIR/nvm.sh" ]; then
 	npx()  { _load_nvm; npx "$@"; }
 fi
 
-eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/slatewave-omp/slatewave.omp.yml)"
-
 eval "$(zoxide init zsh)"
 
 # direnv hook — auto-loads/unloads .envrc files when changing directories.
@@ -57,3 +55,6 @@ fi
 if command -v fastfetch >/dev/null 2>&1; then
 	fastfetch
 fi
+
+# slatewave
+eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/slatewave.omp.yml)"
