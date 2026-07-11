@@ -3,7 +3,29 @@
 # Exits non-zero if any required check fails. Optional checks emit warnings.
 set -uo pipefail
 
-DOTFILES_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
+# Resolve the repo root. Honor an explicit DOTFILES_DIR override; otherwise
+# derive it from this script's own location. The script is symlinked into
+# ~/.local/bin, so dereference the symlink and ask git for the top-level (bin/
+# is one level below the repo root). Fall back to ~/.dotfiles if that fails.
+resolve_dotfiles_dir() {
+	if [[ -n "${DOTFILES_DIR:-}" ]]; then
+		printf '%s' "$DOTFILES_DIR"
+		return
+	fi
+	local src real dir
+	src="${BASH_SOURCE[0]:-}"
+	if [[ -n "$src" ]]; then
+		real="$(readlink -f "$src" 2>/dev/null || printf '%s' "$src")"
+		dir="$(dirname "$real")"
+		if git -C "$dir" rev-parse --show-toplevel &>/dev/null; then
+			git -C "$dir" rev-parse --show-toplevel
+			return
+		fi
+	fi
+	printf '%s' "$HOME/.dotfiles"
+}
+
+DOTFILES_DIR="$(resolve_dotfiles_dir)"
 problems=0
 warnings=0
 
@@ -89,6 +111,33 @@ if [[ -d "$HOME/.config/oh-my-posh/slatewave-omp/.git" ]]; then
 	ok "slatewave-omp cloned"
 else
 	fail "slatewave-omp not cloned at ~/.config/oh-my-posh/slatewave-omp"
+fi
+if [[ -f "$HOME/.config/oh-my-posh/slatewave-omp/slatewave.omp.yml" ]]; then
+	ok "oh-my-posh theme present"
+else
+	fail "oh-my-posh theme missing at ~/.config/oh-my-posh/slatewave-omp/slatewave.omp.yml"
+fi
+if [[ -d "$HOME/.config/delta-slatewave/.git" ]]; then
+	ok "delta-slatewave cloned"
+else
+	fail "delta-slatewave not cloned at ~/.config/delta-slatewave"
+fi
+# ~/.gitconfig-os is only created on the --git install path, so a missing link
+# is a warning rather than a hard failure.
+if [[ -L "$HOME/.gitconfig-os" ]]; then
+	git_os_target="$(readlink "$HOME/.gitconfig-os")"
+	case "$git_os_target" in
+		"$DOTFILES_DIR"/.gitconfig-os-macos | "$DOTFILES_DIR"/.gitconfig-os-linux | "$DOTFILES_DIR"/.gitconfig-os-linux-server)
+			ok "git signing profile → $(basename "$git_os_target")"
+			;;
+		*)
+			fail "~/.gitconfig-os points at $git_os_target, not a known profile under $DOTFILES_DIR"
+			;;
+	esac
+elif [[ -e "$HOME/.gitconfig-os" ]]; then
+	fail "~/.gitconfig-os exists but isn't a symlink to a signing profile"
+else
+	warn "~/.gitconfig-os absent (only created on the --git install path)"
 fi
 
 echo
