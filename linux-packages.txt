@@ -10,3 +10,4 @@ figlet
 ripgrep
 git-delta
 direnv
+shellcheck
