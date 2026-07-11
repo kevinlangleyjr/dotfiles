@@ -100,7 +100,7 @@ After it runs, restart the shell or `source ~/.zshrc`.
 | Command                  | What it does                                                                                                              |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
 | `bak <path>`             | Copies a file or directory to `<path>.bak.YYYY-MM-DD-HHMMSS` in place, preserving attributes (`cp -a`). Prints the new path. |
-| `dotfiles-doctor`        | Verifies the install: repo is a git checkout, required/optional symlinks point at the repo, `~/.zshrc.local` exists, slatewave-omp cloned, `~/.local/bin` on PATH, every `bin/` script linked, every Brewfile tool present. Exits non-zero on failures. Run after a fresh-machine install. |
+| `dotfiles-doctor`        | Verifies the install: repo is a git checkout, required/optional symlinks point at the repo, `~/.zshrc.local` exists, slatewave-omp and delta-slatewave cloned, the git signing profile linked, `~/.local/bin` on PATH, every `bin/` script linked, every Brewfile tool present. Exits non-zero on failures. Run after a fresh-machine install. |
 | `dotfiles-update`        | `cd $DOTFILES_DIR && git pull`. `DOTFILES_DIR` defaults to `~/.dotfiles`.                                                  |
 | `git-cleanup`            | Fetches with `--prune`, then prompts to delete (a) local branches whose upstream is gone and (b) local branches fully merged into the default branch (resolved from `origin/HEAD`, falling back to `main`). |
 | `killport <port>`        | Kills whatever is listening on the given TCP port (`lsof` + `kill -9`). Requires `sudo`.                                   |
