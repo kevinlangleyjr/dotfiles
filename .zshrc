@@ -61,7 +61,10 @@ if [ -s "$NVM_DIR/nvm.sh" ]; then
 	}
 fi
 
-eval "$(zoxide init zsh)"
+# zoxide (frecent directory jumping); guarded so headless hosts don't error.
+if command -v zoxide >/dev/null 2>&1; then
+	eval "$(zoxide init zsh)"
+fi
 
 # direnv hook — auto-loads/unloads .envrc files when changing directories.
 if command -v direnv >/dev/null 2>&1; then
@@ -72,7 +75,9 @@ if command -v fastfetch >/dev/null 2>&1; then
 	fastfetch
 fi
 
-# slatewave
-eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/slatewave.omp.yml)"
+# slatewave prompt; guarded so headless hosts without oh-my-posh don't error.
+if command -v oh-my-posh >/dev/null 2>&1; then
+	eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/slatewave-omp/slatewave.omp.yml)"
+fi
 
 export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:$PATH"
