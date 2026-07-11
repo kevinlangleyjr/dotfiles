@@ -31,18 +31,30 @@ if [ -f ~/.common_env ]; then
 	. ~/.common_env
 fi
 
-# Lazy-load nvm: defer the ~300ms nvm.sh source until first nvm/node/npm/npx call.
+# nvm without the ~300ms startup cost: eagerly put the `default` node version's
+# bin on PATH (cheap — no nvm.sh source) so node/npm/npx are real binaries that
+# work everywhere, including non-interactive shells and captured shell snapshots.
+# Only the `nvm` command itself lazy-sources the full machinery on first use.
 export NVM_DIR="$HOME/.nvm"
 if [ -s "$NVM_DIR/nvm.sh" ]; then
-	_load_nvm() {
-		unset -f nvm node npm npx _load_nvm
+	if [ -f "$NVM_DIR/alias/default" ]; then
+		_nvm_default="$(command cat "$NVM_DIR/alias/default")"
+		# Expand a partial alias (e.g. "24") to the newest matching install.
+		_nvm_ver="$(command ls -1 "$NVM_DIR/versions/node" 2>/dev/null \
+			| grep -E "^v${_nvm_default#v}([.]|$)" | sort -V | tail -1)"
+		if [ -n "$_nvm_ver" ] && [ -d "$NVM_DIR/versions/node/$_nvm_ver/bin" ]; then
+			PATH="$NVM_DIR/versions/node/$_nvm_ver/bin:$PATH"
+		fi
+		unset _nvm_default _nvm_ver
+	fi
+
+	# Lazy-load full nvm only when `nvm` itself is invoked.
+	nvm() {
+		unset -f nvm
 		\. "$NVM_DIR/nvm.sh"
 		[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+		nvm "$@"
 	}
-	nvm()  { _load_nvm; nvm "$@"; }
-	node() { _load_nvm; node "$@"; }
-	npm()  { _load_nvm; npm "$@"; }
-	npx()  { _load_nvm; npx "$@"; }
 fi
 
 eval "$(zoxide init zsh)"
