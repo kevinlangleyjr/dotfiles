@@ -80,8 +80,8 @@
 [tag]
 	forceSignAnnotated = false
 
-[difftool "vscode"]
-	cmd = code --wait --diff $LOCAL $REMOTE
+[difftool "codium"]
+	cmd = codium --wait --diff "$LOCAL" "$REMOTE"
 
 [rerere]
 	enabled = 1

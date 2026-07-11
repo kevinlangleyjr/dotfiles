@@ -86,7 +86,23 @@ alias d='zoxide remove'
 alias p='zoxide query -l'
 
 ## EDITOR
-alias q="code -w"
+# Resolve an editor once, preferring a GUI editor (codium, then code) with
+# --wait so Git blocks until the file is closed; fall back to a terminal editor
+# on headless hosts (those already block until you exit). Set before the q
+# alias below so it reuses the resolved value.
+for _ed in codium code nvim vim nano; do
+	if command -v "$_ed" >/dev/null 2>&1; then
+		case "$_ed" in
+			codium | code) export EDITOR="$_ed --wait" ;;
+			*)             export EDITOR="$_ed" ;;
+		esac
+		break
+	fi
+done
+unset _ed
+
+# q — open in the resolved editor and wait for it to close.
+alias q="$EDITOR"
 
 ## GIT ALIASES
 alias g="git"
@@ -183,8 +199,6 @@ extract() {
 sortSize() {
 	du -sh ./* | sort -h
 }
-
-export EDITOR="code"
 
 case "$(uname -s)" in
 	Darwin) [[ -r "$HOME/.macos_env" ]] && source "$HOME/.macos_env" ;;
