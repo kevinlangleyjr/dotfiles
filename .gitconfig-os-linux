@@ -1,2 +1,11 @@
+# 1Password (Linux desktop/laptop): sign SSH-format commits via op-ssh-sign.
+[gpg]
+	format = ssh
 [gpg "ssh"]
 	program = /opt/1Password/op-ssh-sign
+[user]
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRoiFWS1boIQpfZVIWfBwHLdwPqll48l5DA4caovw7R
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true

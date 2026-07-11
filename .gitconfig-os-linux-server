@@ -1,0 +1,15 @@
+# Linux server without 1Password (e.g. the DigitalOcean VM): sign SSH-format
+# commits with git's built-in ssh-keygen signer — no gpg.ssh.program, no
+# 1Password. The signing key is host-specific: this points at the conventional
+# path; if this host's key lives elsewhere, override user.signingkey in
+# ~/.gitconfig.local. Add the matching public key to GitHub as a *signing* key
+# (Settings → SSH and GPG keys → New SSH key → Key type: Signing) so commits
+# show as Verified.
+[gpg]
+	format = ssh
+[user]
+	signingkey = ~/.ssh/id_ed25519.pub
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true
