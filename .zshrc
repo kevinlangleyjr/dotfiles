@@ -15,7 +15,11 @@ fi
 
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
-export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+# yarn: the `yarn` command comes via corepack on the node bin dir (added below).
+# These are only the classic `yarn global` bin dirs — add them if they exist so
+# a missing/empty dir never lands on PATH.
+[ -d "$HOME/.config/yarn/global/node_modules/.bin" ] && PATH="$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+[ -d "$HOME/.yarn/bin" ] && PATH="$HOME/.yarn/bin:$PATH"
 
 # pnpm
 export PNPM_HOME="$HOME/.local/share/pnpm"
