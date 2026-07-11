@@ -12,11 +12,19 @@ resolve_dotfiles_dir() {
 		printf '%s' "$DOTFILES_DIR"
 		return
 	fi
-	local src real dir
+	local src dir link
 	src="${BASH_SOURCE[0]:-}"
 	if [[ -n "$src" ]]; then
-		real="$(readlink -f "$src" 2>/dev/null || printf '%s' "$src")"
-		dir="$(dirname "$real")"
+		# Follow symlinks portably — BSD/macOS readlink has no -f. Resolve each
+		# link relative to its own directory until we reach the real file.
+		while [[ -L "$src" ]]; do
+			link="$(readlink "$src")"
+			case "$link" in
+				/*) src="$link" ;;
+				*)  src="$(dirname "$src")/$link" ;;
+			esac
+		done
+		dir="$(cd "$(dirname "$src")" && pwd)"
 		if git -C "$dir" rev-parse --show-toplevel &>/dev/null; then
 			git -C "$dir" rev-parse --show-toplevel
 			return

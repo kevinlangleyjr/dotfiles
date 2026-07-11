@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+# This job only lints; it never needs write access or the checkout token.
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Shell lint and syntax checks
@@ -11,6 +15,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       # shellcheck is preinstalled on ubuntu-latest runners.
       # --severity=error keeps pre-existing style/info/warning lint from

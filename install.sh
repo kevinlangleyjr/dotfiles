@@ -67,6 +67,23 @@ move_existing_to_old() {
 	echo "install: previous ${name} moved to ${name}.old" >&2
 }
 
+# Clone a git repo into a target dir unless it's already a checkout. Errors
+# clearly when the target exists but isn't a git repo, since `git clone` would
+# otherwise fail cryptically and abort the script under `set -e`.
+clone_if_absent() {
+	local dir=$1 url=$2 label=$3
+	if [[ -d "$dir/.git" ]]; then
+		echo "install: $label already present at $dir" >&2
+		return 0
+	fi
+	if [[ -e "$dir" ]] && [[ -n "$(ls -A "$dir" 2>/dev/null)" ]]; then
+		echo "install: $dir exists but is not a $label checkout; remove it and re-run." >&2
+		exit 1
+	fi
+	mkdir -p "$(dirname "$dir")"
+	git clone "$url" "$dir"
+}
+
 resolve_dotfiles_dir() {
 	if [[ -n "${DOTFILES:-}" ]]; then
 		printf '%s' "$DOTFILES"
@@ -144,21 +161,11 @@ ln -sf "$DOTFILES_DIR/.common_env" "$HOME/.common_env"
 
 SLATEWAVE_OMP_DIR="$HOME/.config/oh-my-posh/slatewave-omp"
 SLATEWAVE_OMP_URL="${SLATEWAVE_OMP_URL:-git@github.com:kevinlangleyjr/slatewave-omp.git}"
-if [[ ! -d "$SLATEWAVE_OMP_DIR/.git" ]]; then
-	mkdir -p "$(dirname "$SLATEWAVE_OMP_DIR")"
-	git clone "$SLATEWAVE_OMP_URL" "$SLATEWAVE_OMP_DIR"
-else
-	echo "install: slatewave-omp already present at $SLATEWAVE_OMP_DIR" >&2
-fi
+clone_if_absent "$SLATEWAVE_OMP_DIR" "$SLATEWAVE_OMP_URL" "slatewave-omp"
 
 DELTA_SLATEWAVE_DIR="$HOME/.config/delta-slatewave"
 DELTA_SLATEWAVE_URL="${DELTA_SLATEWAVE_URL:-ssh://git@github.com/kevinlangleyjr/delta-slatewave.git}"
-if [[ ! -d "$DELTA_SLATEWAVE_DIR/.git" ]]; then
-	mkdir -p "$(dirname "$DELTA_SLATEWAVE_DIR")"
-	git clone "$DELTA_SLATEWAVE_URL" "$DELTA_SLATEWAVE_DIR"
-else
-	echo "install: delta-slatewave already present at $DELTA_SLATEWAVE_DIR" >&2
-fi
+clone_if_absent "$DELTA_SLATEWAVE_DIR" "$DELTA_SLATEWAVE_URL" "delta-slatewave"
 
 case "$(uname -s)" in
 	Darwin) ln -sf "$DOTFILES_DIR/.macos_env" "$HOME/.macos_env" ;;

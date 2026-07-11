@@ -81,7 +81,7 @@
 	forceSignAnnotated = false
 
 [difftool "codium"]
-	cmd = codium --wait --diff $LOCAL $REMOTE
+	cmd = codium --wait --diff "$LOCAL" "$REMOTE"
 
 [rerere]
 	enabled = 1
