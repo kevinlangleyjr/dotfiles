@@ -4,17 +4,13 @@
 [user]
 	name = Kevin Langley Jr.
 	email = me@kevinlangleyjr.dev
-#	signingKey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRoiFWS1boIQpfZVIWfBwHLdwPqll48l5DA4caovw7R
 
-#[commit]
-#	gpgSign = true
-
-#[gpg]
-#	program = /usr/local/bin/gpg
-#	format = ssh
-
-# gpg.ssh.program lives in OS-specific includes below — 1Password's
-# op-ssh-sign binary path differs per platform.
+# Commit signing is configured per-machine in ~/.gitconfig-os, which install.sh
+# links to the profile that fits this host (git can't branch on OS/host itself):
+#   .gitconfig-os-macos         → 1Password op-ssh-sign (macOS)
+#   .gitconfig-os-linux         → 1Password op-ssh-sign (Linux desktop/laptop)
+#   .gitconfig-os-linux-server  → native ssh-keygen signer (no 1Password)
+# Machine-specific overrides go in ~/.gitconfig.local (untracked; see below).
 
 [core]
 	autocrlf = input
@@ -134,7 +130,15 @@
 [includeIf "gitdir:~/go/src/go.1password.io/"]
 	path = ~/.gitconfig-agilebits
 
-# --- OS-specific overrides (e.g. 1Password op-ssh-sign path) ---
+# --- Per-machine signing profile (linked by install.sh) + local overrides ---
+# A missing include path is silently ignored, so ~/.gitconfig.local is optional
+# and, being last, wins over the profile above it.
+
+[include]
+	path = ~/.gitconfig-os
+
+[include]
+	path = ~/.gitconfig.local
 
 [include]
 	path = /home/kevin/.config/delta-slatewave/slatewave.gitconfig

@@ -100,15 +100,40 @@ if want_git_dotfiles; then
 	move_existing_to_old "$HOME/.gitconfig" "$DOTFILES_DIR/.gitconfig"
 	move_existing_to_old "$HOME/.gitignore_global" "$DOTFILES_DIR/.gitignore_global"
 	move_existing_to_old "$HOME/.gitconfig-agilebits" "$DOTFILES_DIR/.gitconfig-agilebits"
-	move_existing_to_old "$HOME/.gitconfig-os-linux" "$DOTFILES_DIR/.gitconfig-os-linux"
-	move_existing_to_old "$HOME/.gitconfig-os-macos" "$DOTFILES_DIR/.gitconfig-os-macos"
 	ln -sf "$DOTFILES_DIR/.gitconfig" "$HOME/.gitconfig"
 	ln -sf "$DOTFILES_DIR/.gitignore_global" "$HOME/.gitignore_global"
 	ln -sf "$DOTFILES_DIR/.gitconfig-agilebits" "$HOME/.gitconfig-agilebits"
-	ln -sf "$DOTFILES_DIR/.gitconfig-os-linux" "$HOME/.gitconfig-os-linux"
-	ln -sf "$DOTFILES_DIR/.gitconfig-os-macos" "$HOME/.gitconfig-os-macos"
+
+	# Select the commit-signing profile for this host and expose it as
+	# ~/.gitconfig-os (git can't branch on OS/host, so we decide here). On Linux
+	# the presence of 1Password's op-ssh-sign distinguishes a desktop/laptop from
+	# a headless server that must fall back to the native ssh-keygen signer.
+	case "$(uname -s)" in
+		Darwin) git_os_profile=".gitconfig-os-macos" ;;
+		Linux)
+			if [[ -x /opt/1Password/op-ssh-sign ]]; then
+				git_os_profile=".gitconfig-os-linux"
+			else
+				git_os_profile=".gitconfig-os-linux-server"
+			fi
+			;;
+		*) git_os_profile="" ;;
+	esac
+	if [[ -n "$git_os_profile" ]]; then
+		# ~/.gitconfig-os is fully install-managed: re-point it without backup
+		# churn when it already points inside the dotfiles dir.
+		if [[ -L "$HOME/.gitconfig-os" && "$(readlink "$HOME/.gitconfig-os")" == "$DOTFILES_DIR/"* ]]; then
+			rm -f "$HOME/.gitconfig-os"
+		else
+			move_existing_to_old "$HOME/.gitconfig-os" "$DOTFILES_DIR/$git_os_profile"
+		fi
+		ln -sf "$DOTFILES_DIR/$git_os_profile" "$HOME/.gitconfig-os"
+		echo "install: git signing profile -> $git_os_profile" >&2
+	else
+		echo "install: unknown OS $(uname -s); skipped ~/.gitconfig-os signing profile" >&2
+	fi
 else
-	echo "install: skipped ~/.gitconfig, ~/.gitignore_global, ~/.gitconfig-agilebits, ~/.gitconfig-os-{linux,macos}" >&2
+	echo "install: skipped ~/.gitconfig, ~/.gitignore_global, ~/.gitconfig-agilebits, ~/.gitconfig-os" >&2
 fi
 
 move_existing_to_old "$HOME/.zshrc" "$DOTFILES_DIR/.zshrc"
