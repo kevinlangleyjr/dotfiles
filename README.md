@@ -16,7 +16,7 @@ Personal shell and Git configuration for **macOS** and **Linux**, managed as a g
 | [`.gitignore_global`](.gitignore_global)                | Patterns ignored by Git everywhere (`core.excludesFile`)                                |
 | [`.zshrc`](.zshrc)                                      | Zsh entrypoint (oh-my-posh + slatewave theme, zoxide, lazy nvm). Linked by the installer; an existing `~/.zshrc` is moved to `~/.zshrc.old` first |
 | [`.zshrc.local.example`](.zshrc.local.example)          | Template for per-machine values (e.g. `CLAUDE_1P_DEV_ENV_ID`); copy to `~/.zshrc.local`              |
-| [`bin/`](bin/)                                          | Standalone helper scripts (`killport`, `dotfiles-update`); installer symlinks each into `~/.local/bin` |
+| [`bin/`](bin/)                                          | Standalone helper scripts (`bak`, `dotfiles-doctor`, `dotfiles-update`, `git-cleanup`, `killport`, `portcheck`, `whichall`); installer symlinks each into `~/.local/bin` |
 | [`Brewfile`](Brewfile)                                  | macOS dependencies — installed by `install.sh` via `brew bundle` (skip with `--no-bootstrap`)         |
 | [`linux-packages.txt`](linux-packages.txt)              | Linux package list, advisory only — `install.sh` prints it but doesn't run apt for you               |
 
@@ -34,6 +34,8 @@ These are pulled in by `Brewfile` on macOS (or `linux-packages.txt` on Linux). T
 | [git-delta](https://github.com/dandavison/delta) | Git diff pager (configured in `.gitconfig`)            |
 | `figlet`, `lolcat`                         | Banner / rainbow text helpers (`label`, `title`, `hero`, `morning`) |
 | [nvm](https://github.com/nvm-sh/nvm)       | Node version manager — lazy-loaded; install separately       |
+
+> **Node is managed by [nvm](https://github.com/nvm-sh/nvm), which the bootstrap does NOT install.** `.zshrc` lazy-loads nvm (so it only pays the startup cost on the first `node`/`npm`/`npx` call), but it expects nvm to already be on disk. Install it yourself following the [nvm instructions](https://github.com/nvm-sh/nvm#installing-and-updating); nvm then provides `node`, `npm`, and `npx`. Without nvm, those commands won't exist.
 
 ## Requirements
 
@@ -97,15 +99,19 @@ After it runs, restart the shell or `source ~/.zshrc`.
 
 | Command                  | What it does                                                                                                              |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `killport <port>`        | Kills any process listening on the given TCP port. Requires `sudo`.                                                       |
+| `bak <path>`             | Copies a file or directory to `<path>.bak.YYYY-MM-DD-HHMMSS` in place, preserving attributes (`cp -a`). Prints the new path. |
+| `dotfiles-doctor`        | Verifies the install: repo is a git checkout, required/optional symlinks point at the repo, `~/.zshrc.local` exists, slatewave-omp cloned, `~/.local/bin` on PATH, every `bin/` script linked, every Brewfile tool present. Exits non-zero on failures. Run after a fresh-machine install. |
 | `dotfiles-update`        | `cd $DOTFILES_DIR && git pull`. `DOTFILES_DIR` defaults to `~/.dotfiles`.                                                  |
-| `bak <path>`             | Copies a file or directory to `<path>.bak.YYYY-MM-DD-HHMMSS` in place. Prints the new path.                                |
-| `whichall <cmd>`         | Lists every executable matching `<cmd>` across `$PATH`, not just the first. Useful for PATH conflicts (brew vs nvm, etc.). |
+| `git-cleanup`            | Fetches with `--prune`, then prompts to delete (a) local branches whose upstream is gone and (b) local branches fully merged into the default branch (resolved from `origin/HEAD`, falling back to `main`). |
+| `killport <port>`        | Kills whatever is listening on the given TCP port (`lsof` + `kill -9`). Requires `sudo`.                                   |
 | `portcheck <port>`       | Read-only counterpart to `killport`: prints what's listening on a TCP port (no `sudo` needed for your own processes).      |
-| `git-cleanup`            | Fetches with `--prune`, then prompts to delete (a) local branches whose upstream is gone and (b) local branches fully merged into the default branch. |
-| `dotfiles-doctor`        | Verifies the install: every symlink points at the repo, `~/.zshrc.local` exists, slatewave-omp cloned, `~/.local/bin` on PATH, every `bin/` script linked, every Brewfile tool present. Run after a fresh-machine install. |
+| `whichall <cmd>`         | Lists every executable matching `<cmd>` across `$PATH`, not just the first. Useful for PATH conflicts (brew vs nvm, etc.). |
 
 `.common_env` keeps `killPort` / `updateDotfiles` aliases pointed at these for muscle-memory continuity.
+
+### Health check
+
+Run [`dotfiles-doctor`](bin/dotfiles-doctor) any time to confirm the install is wired up correctly — it walks every symlink, per-machine file, PATH entry, and expected tool, and exits non-zero if anything required is missing. It's the fastest way to sanity-check a fresh-machine install.
 
 ## Platform-specific env
 
@@ -121,6 +127,20 @@ cp .zshrc.local.example ~/.zshrc.local
 ```
 
 At minimum, set `CLAUDE_1P_DEV_ENV_ID` (get the value from your local 1P setup).
+
+## Commit signing
+
+Signing is configured **per machine**. Git can't branch on OS or host, so `install.sh` links `~/.gitconfig-os` to the profile that fits the current host, and `.gitconfig` just `include`s `~/.gitconfig-os`:
+
+| Host                         | Profile linked as `~/.gitconfig-os` | Signer                          |
+| ---------------------------- | ----------------------------------- | ------------------------------- |
+| macOS                        | `.gitconfig-os-macos`               | 1Password `op-ssh-sign`         |
+| Linux desktop / laptop       | `.gitconfig-os-linux`               | 1Password `op-ssh-sign`         |
+| Linux headless server        | `.gitconfig-os-linux-server`        | git's native `ssh-keygen` signer |
+
+On Linux the installer picks the server profile when 1Password's `op-ssh-sign` (`/opt/1Password/op-ssh-sign`) isn't present, so a headless box with no 1Password falls back to the native signer automatically.
+
+`~/.gitconfig` also `include`s `~/.gitconfig.local` **last** (untracked, optional — a missing path is silently ignored), so per-machine overrides win over the profile above. That's where a server keeps its own signing key path (e.g. `user.signingkey`) without committing it.
 
 ## Troubleshooting
 
