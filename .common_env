@@ -12,6 +12,22 @@ fi
 # Case-insensitive matching: lowercase matches uppercase
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
+# Persist history across sessions. zsh defaults to no HISTFILE and
+# SAVEHIST=0, so without this nothing is ever written to disk.
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
+
+setopt append_history          # merge into the file instead of overwriting it
+setopt inc_append_history      # write each command as it runs, so a dropped
+                               # SSH session doesn't take its history with it
+setopt extended_history        # record timestamp and duration per entry
+setopt hist_expire_dups_first  # drop duplicates first once SAVEHIST is hit
+setopt hist_ignore_dups        # skip a command identical to the one before it
+setopt hist_ignore_space       # skip commands typed with a leading space
+setopt hist_reduce_blanks      # normalize whitespace before saving
+setopt hist_verify             # expand !! onto the line rather than running it
+
 # Up/Down arrow searches history for entries starting with the current
 # input prefix, then moves cursor to end of line. Bind both terminfo
 # (application keypad mode) and the literal CSI/SS3 sequences so this

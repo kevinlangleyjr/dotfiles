@@ -4,14 +4,14 @@
 [user]
 	name = Kevin Langley Jr.
 	email = me@kevinlangleyjr.dev
-	signingKey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRoiFWS1boIQpfZVIWfBwHLdwPqll48l5DA4caovw7R
+#	signingKey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRoiFWS1boIQpfZVIWfBwHLdwPqll48l5DA4caovw7R
 
-[commit]
-	gpgSign = true
+#[commit]
+#	gpgSign = true
 
-[gpg]
-	program = /usr/local/bin/gpg
-	format = ssh
+#[gpg]
+#	program = /usr/local/bin/gpg
+#	format = ssh
 
 # gpg.ssh.program lives in OS-specific includes below — 1Password's
 # op-ssh-sign binary path differs per platform.
@@ -19,7 +19,6 @@
 [core]
 	autocrlf = input
 	whitespace = fix,space-before-tab,tab-in-indent,trailing-space
-	editor = code --wait --new-window
 	excludesFile = ~/.gitignore_global
 	pager = delta
 
@@ -66,14 +65,10 @@
 
 [merge]
 	log = true
-	tool = vscode
 	conflictStyle = zdiff3
 
-[mergetool "vscode"]
-	cmd = code --wait $MERGED
-
 [diff]
-	tool = vscode
+	tool = delta
 	colorMoved = default
 
 [fetch]
@@ -141,10 +136,5 @@
 
 # --- OS-specific overrides (e.g. 1Password op-ssh-sign path) ---
 
-[includeIf "gitdir:/Users/"]
-	path = ~/.gitconfig-os-macos
-
-[includeIf "gitdir:/home/"]
-	path = ~/.gitconfig-os-linux
 [include]
 	path = /home/kevin/.config/delta-slatewave/slatewave.gitconfig

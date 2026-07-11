@@ -58,3 +58,6 @@ fi
 
 # slatewave
 eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/slatewave.omp.yml)"
+
+# npm user-global packages
+export PATH="$HOME/.npm-global/bin:$PATH"
