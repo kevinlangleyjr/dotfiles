@@ -15,4 +15,5 @@ if [[ -S "$_op_sock" ]]; then
 fi
 unset _op_sock
 
-source ~/.1P
+# Optional 1Password helper; only source it if present and readable.
+[[ -r "$HOME/.1P" ]] && source "$HOME/.1P"
