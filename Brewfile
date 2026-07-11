@@ -11,3 +11,4 @@ brew "figlet"
 brew "ripgrep"
 brew "git-delta"
 brew "direnv"
+brew "shellcheck" # shell linter used by CI; handy for local script checks

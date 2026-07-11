@@ -139,6 +139,7 @@ fi
 move_existing_to_old "$HOME/.zshrc" "$DOTFILES_DIR/.zshrc"
 ln -sf "$DOTFILES_DIR/.zshrc" "$HOME/.zshrc"
 
+move_existing_to_old "$HOME/.common_env" "$DOTFILES_DIR/.common_env"
 ln -sf "$DOTFILES_DIR/.common_env" "$HOME/.common_env"
 
 SLATEWAVE_OMP_DIR="$HOME/.config/oh-my-posh/slatewave-omp"
@@ -148,6 +149,15 @@ if [[ ! -d "$SLATEWAVE_OMP_DIR/.git" ]]; then
 	git clone "$SLATEWAVE_OMP_URL" "$SLATEWAVE_OMP_DIR"
 else
 	echo "install: slatewave-omp already present at $SLATEWAVE_OMP_DIR" >&2
+fi
+
+DELTA_SLATEWAVE_DIR="$HOME/.config/delta-slatewave"
+DELTA_SLATEWAVE_URL="${DELTA_SLATEWAVE_URL:-ssh://git@github.com/kevinlangleyjr/delta-slatewave.git}"
+if [[ ! -d "$DELTA_SLATEWAVE_DIR/.git" ]]; then
+	mkdir -p "$(dirname "$DELTA_SLATEWAVE_DIR")"
+	git clone "$DELTA_SLATEWAVE_URL" "$DELTA_SLATEWAVE_DIR"
+else
+	echo "install: delta-slatewave already present at $DELTA_SLATEWAVE_DIR" >&2
 fi
 
 case "$(uname -s)" in
