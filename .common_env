@@ -180,6 +180,10 @@ extract() {
 	esac
 }
 
+sortSize() {
+	du -sh ./* | sort -h
+}
+
 export EDITOR="code"
 
 case "$(uname -s)" in
