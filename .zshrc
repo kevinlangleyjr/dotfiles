@@ -23,12 +23,16 @@ export PATH=$PATH:$GOPATH/bin
 
 # pnpm
 export PNPM_HOME="$HOME/.local/share/pnpm"
-if [ -d "$PNPM_HOME" ]; then
-	case ":$PATH:" in
-		*":$PNPM_HOME:"*) ;;
-		*) export PATH="$PNPM_HOME:$PATH" ;;
-	esac
-fi
+# pnpm >=9 installs global binaries into $PNPM_HOME/bin, so both must be on PATH.
+for pnpm_dir in "$PNPM_HOME" "$PNPM_HOME/bin"; do
+	if [ -d "$pnpm_dir" ]; then
+		case ":$PATH:" in
+			*":$pnpm_dir:"*) ;;
+			*) export PATH="$pnpm_dir:$PATH" ;;
+		esac
+	fi
+done
+unset pnpm_dir
 # pnpm end
 
 if [ -f ~/.common_env ]; then
