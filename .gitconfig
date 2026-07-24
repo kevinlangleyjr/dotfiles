@@ -143,3 +143,5 @@
 
 [include]
 	path = ~/.gitconfig.local
+[gpg "ssh"]
+	allowedSignersFile = /Users/kevin.langleyjr/.config/git/allowed_signers
