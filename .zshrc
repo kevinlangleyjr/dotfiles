@@ -81,7 +81,7 @@ fi
 
 # slatewave prompt; guarded so headless hosts without oh-my-posh don't error.
 if command -v oh-my-posh >/dev/null 2>&1; then
-	eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/slatewave.omp.yml)"
+	eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/slatewave-omp/slatewave.omp.yml)"
 fi
 
 export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:$PATH"
