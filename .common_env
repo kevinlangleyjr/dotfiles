@@ -128,6 +128,17 @@ alias gp="g push"
 alias gpo="gp origin"
 alias gpt="gp --tags"
 
+### Git Worktrees
+alias gw="g worktree"
+alias gwa="gw add"
+alias gwl="gw list"
+alias gwlo="gw lock"
+alias gwm="gw move"
+alias gwp="gw prune"
+alias gwrm="gw remove"
+alias gwr="gw repair"
+alias gwu="gw unlock"
+
 ## PIPE ALIASES
 alias -g L='|less'
 alias -g G='|rg'
