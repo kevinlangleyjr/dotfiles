@@ -153,6 +153,7 @@ alias path='echo $PATH | tr ":" "\n" | nl'
 
 ## MISC ALIASES
 alias code.="code ."
+alias t="lstr"
 
 ## MISSPELLED COMMAND ALIASES
 alias yarm='yarn'
