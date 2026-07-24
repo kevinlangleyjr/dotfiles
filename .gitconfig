@@ -137,8 +137,9 @@
 [include]
 	path = ~/.gitconfig-os
 
+# delta "slatewave" diff theme, cloned to ~/.config/delta-slatewave by install.sh.
 [include]
-	path = ~/.gitconfig.local
+	path = ~/.config/delta-slatewave/slatewave.gitconfig
 
 [include]
-	path = /home/kevin/.config/delta-slatewave/slatewave.gitconfig
+	path = ~/.gitconfig.local
