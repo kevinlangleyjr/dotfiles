@@ -190,6 +190,50 @@ for script in "$DOTFILES_DIR"/bin/*; do
 	ln -sf "$script" "$HOME/.local/bin/$(basename "$script")"
 done
 
+# Install Neovim (Linux) from the official self-contained tarball, which ships
+# the binary together with its runtime (share/nvim/runtime). Copying just the
+# nvim binary breaks it: without the runtime it can't find vim.uri/syntax.vim
+# and aborts at startup. macOS installs nvim via the Brewfile instead.
+install_neovim_linux() {
+	local min_major=0 min_minor=11 have_ver
+	if command -v nvim >/dev/null 2>&1; then
+		have_ver=$(nvim --version 2>/dev/null | sed -n '1s/^NVIM v\([0-9]*\.[0-9]*\).*/\1/p')
+		if [[ -n "$have_ver" ]]; then
+			local maj=${have_ver%%.*} min=${have_ver##*.}
+			# Skip only when it's already OUR install (the runtime tree exists) and
+			# new enough. A bare copied binary reports a version but has no runtime,
+			# so it fails this check and gets reinstalled.
+			if (( maj > min_major || (maj == min_major && min >= min_minor) )) \
+				&& [[ -d "$HOME/.local/nvim/share/nvim/runtime" ]]; then
+				echo "install: neovim $have_ver already installed" >&2
+				return 0
+			fi
+		fi
+	fi
+	local tarch
+	case "$(uname -m)" in
+		x86_64) tarch=x86_64 ;;
+		aarch64 | arm64) tarch=arm64 ;;
+		*) echo "install: unsupported arch $(uname -m); skipping neovim" >&2; return 0 ;;
+	esac
+	local url="https://github.com/neovim/neovim/releases/download/stable/nvim-linux-${tarch}.tar.gz"
+	local tmp
+	tmp=$(mktemp -d)
+	echo "install: installing neovim (stable) to ~/.local/nvim..." >&2
+	if curl -fL --retry 3 -o "$tmp/nvim.tar.gz" "$url" && tar xzf "$tmp/nvim.tar.gz" -C "$tmp"; then
+		rm -rf "$HOME/.local/nvim"
+		mv "$tmp/nvim-linux-${tarch}" "$HOME/.local/nvim"
+		ln -sf "$HOME/.local/nvim/bin/nvim" "$HOME/.local/bin/nvim"
+		echo "install: neovim -> $("$HOME/.local/bin/nvim" --version | head -1)" >&2
+	else
+		echo "install: neovim download failed; skipping" >&2
+	fi
+	rm -rf "$tmp"
+}
+if [[ "$(uname -s)" == Linux ]]; then
+	install_neovim_linux
+fi
+
 # Bootstrap external tools the shell config expects (oh-my-posh, zoxide, etc).
 if [[ "$BOOTSTRAP" == "yes" ]]; then
 	case "$(uname -s)" in
