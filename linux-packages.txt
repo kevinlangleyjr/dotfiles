@@ -55,3 +55,9 @@ satty
 # Keeps the mirrorlist fresh. Needs /etc/xdg/reflector/reflector.conf plus
 # `systemctl enable --now reflector.timer` to actually run.
 reflector
+
+# Secret Service provider (org.freedesktop.secrets). 1Password stores its
+# two-factor token through it and reports "unable to save your two-factor
+# token" when nothing implements the interface. Needs the pam_gnome_keyring
+# lines in /etc/pam.d/greetd to unlock with the login password.
+gnome-keyring
