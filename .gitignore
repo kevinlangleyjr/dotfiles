@@ -4,3 +4,5 @@
 *.local
 *.swp
 *.swo
+# per-machine Hyprland settings, seeded by install.sh from local.conf.example
+.config/hypr/local.conf

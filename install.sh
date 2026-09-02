@@ -176,6 +176,35 @@ case "$(uname -s)" in
 		;;
 esac
 
+# Link XDG config directories (repo .config/<name> -> ~/.config/<name>) at the
+# directory level, so files added inside a config dir later are tracked without
+# touching the installer. -n stops ln from descending into an existing link.
+# Tools that write state next to their config should be left out of .config/
+# or linked per-file instead.
+if [[ -d "$DOTFILES_DIR/.config" ]]; then
+	mkdir -p "$HOME/.config"
+	for dir in "$DOTFILES_DIR"/.config/*/; do
+		[[ -d "$dir" ]] || continue
+		dir=${dir%/}
+		name=$(basename "$dir")
+		move_existing_to_old "$HOME/.config/$name" "$dir"
+		ln -sfn "$dir" "$HOME/.config/$name"
+	done
+fi
+
+# Hyprland sources ~/.config/hypr/local.conf for per-machine values (monitors,
+# scale, env) and errors at launch if a sourced file is missing — seed it like
+# ~/.zshrc.local. Because ~/.config/hypr is a symlink into this repo, the file
+# lands in the checkout; it's gitignored so it stays per-machine.
+if [[ -d "$DOTFILES_DIR/.config/hypr" && ! -e "$DOTFILES_DIR/.config/hypr/local.conf" ]]; then
+	if [[ -f "$DOTFILES_DIR/.config/hypr/local.conf.example" ]]; then
+		cp "$DOTFILES_DIR/.config/hypr/local.conf.example" "$DOTFILES_DIR/.config/hypr/local.conf"
+	else
+		touch "$DOTFILES_DIR/.config/hypr/local.conf"
+	fi
+	echo "install: created ~/.config/hypr/local.conf from template — set per-machine monitor/env values there" >&2
+fi
+
 # Seed ~/.zshrc.local from the example if it doesn't exist yet.
 if [[ ! -e "$HOME/.zshrc.local" ]]; then
 	cp "$DOTFILES_DIR/.zshrc.local.example" "$HOME/.zshrc.local"
