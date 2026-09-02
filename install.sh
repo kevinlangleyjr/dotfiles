@@ -198,6 +198,16 @@ if [[ -d "$DOTFILES_DIR/.config" ]]; then
 	done
 fi
 
+# Dark mode. The GTK settings.ini files come in via the .config link above, but
+# the preference apps actually query is the dconf one, which the portal
+# re-exports as org.freedesktop.appearance — a binary store, so it can't be
+# symlinked and has to be set here. Qt reads it through the portal too; see the
+# QT_QPA_PLATFORMTHEME env in .config/hypr/hyprland.lua.
+if command -v gsettings >/dev/null 2>&1; then
+	gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+	gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+fi
+
 # hyprland.lua loads ~/.config/hypr/local.lua for per-machine values (monitors,
 # scale, env) via pcall(require, "local"), so a missing file is harmless — seed
 # it anyway so new machines start from the commented template, mirroring
