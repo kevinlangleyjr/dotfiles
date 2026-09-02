@@ -130,6 +130,11 @@ if [[ -d "$HOME/.config/delta-slatewave/.git" ]]; then
 else
 	fail "delta-slatewave not cloned at ~/.config/delta-slatewave"
 fi
+if [[ -d "$HOME/.claude/skills/.git" ]]; then
+	ok "claude-skills cloned"
+else
+	fail "claude-skills not cloned at ~/.claude/skills"
+fi
 # ~/.gitconfig-os is only created on the --git install path, so a missing link
 # is a warning rather than a hard failure.
 if [[ -L "$HOME/.gitconfig-os" ]]; then

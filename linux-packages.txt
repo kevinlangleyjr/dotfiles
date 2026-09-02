@@ -13,3 +13,4 @@ ripgrep
 git-delta
 direnv
 shellcheck
+jq

@@ -88,6 +88,7 @@ Plus:
 - Each executable in `bin/` symlinked into `~/.local/bin/`
 - `~/.zshrc.local` seeded from `.zshrc.local.example` if it doesn't exist
 - The `slatewave-omp` oh-my-posh theme cloned to `~/.config/oh-my-posh/slatewave-omp` if missing
+- The `claude-skills` repo cloned to `~/.claude/skills` if missing, and its CLI helpers symlinked into `~/.local/bin/`
 - macOS: `brew bundle` against the repo's `Brewfile` (unless `--no-bootstrap`)
 - Linux: prints the `linux-packages.txt` advisory list (unless `--no-bootstrap`)
 
