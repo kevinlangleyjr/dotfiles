@@ -14,3 +14,13 @@ git-delta
 direnv
 shellcheck
 jq
+
+# less backs git's pager: core.pager is delta, and delta colorizes then pipes to
+# less, so without it `git log` dumps to stdout with no paging at all. Arch does
+# not pull it in with base.
+less
+
+# Image and PDF viewers. Without one installed, xdg-open sends screenshots to
+# whatever claims image/png — a browser, on a fresh machine.
+loupe
+papers
