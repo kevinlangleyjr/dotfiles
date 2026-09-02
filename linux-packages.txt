@@ -42,3 +42,16 @@ pacman-contrib
 # it exposes profiles over D-Bus (so the AGS quick settings can drive it) and
 # the two conflict if both are installed.
 power-profiles-daemon
+
+# Clipboard history (cliphist stores, wofi is the picker in clipboard.sh) and
+# the colour picker, screen recorder and screenshot annotator wired to binds in
+# hyprland.lua.
+cliphist
+wofi
+hyprpicker
+wf-recorder
+satty
+
+# Keeps the mirrorlist fresh. Needs /etc/xdg/reflector/reflector.conf plus
+# `systemctl enable --now reflector.timer` to actually run.
+reflector
