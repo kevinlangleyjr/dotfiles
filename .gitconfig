@@ -143,5 +143,6 @@
 
 [include]
 	path = ~/.gitconfig.local
+	path = /home/kevin/.config/delta-slatewave/slatewave.gitconfig
 [gpg "ssh"]
 	allowedSignersFile = /Users/kevin.langleyjr/.config/git/allowed_signers

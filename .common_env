@@ -161,6 +161,10 @@ alias t="lstr"
 alias yarm='yarn'
 alias gkl='git pull'
 
+if command -v nvim >/dev/null 2>&1; then
+	alias vi="nvim"
+fi
+
 ## RAINBOW / BANNER ALIASES (figlet + lolcat)
 # Only define if the tools are installed.
 if command -v lolcat >/dev/null 2>&1; then
