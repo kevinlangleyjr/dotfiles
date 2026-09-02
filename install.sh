@@ -275,9 +275,35 @@ if [[ "$BOOTSTRAP" == "yes" ]]; then
 			fi
 			;;
 		Linux)
-			echo "install: Linux bootstrap is advisory only. Recommended packages:" >&2
-			grep -v '^\s*#' "$DOTFILES_DIR/linux-packages.txt" | grep -v '^\s*$' | sed 's/^/  - /' >&2
-			echo "install: install them with your package manager, e.g. sudo apt install <pkg>..." >&2
+			if command -v pacman >/dev/null 2>&1; then
+				echo "install: installing packages from linux-packages.txt via pacman..." >&2
+				# --needed skips packages already installed, keeping re-runs idempotent.
+				grep -v '^\s*#' "$DOTFILES_DIR/linux-packages.txt" | grep -v '^\s*$' | sudo pacman -S --needed -
+			elif command -v apt-get >/dev/null 2>&1; then
+				echo "install: installing packages from linux-packages.txt via apt..." >&2
+				# apt aborts the whole install if any single name is unknown, and
+				# Ubuntu releases lag on some of these (e.g. fastfetch) — so install
+				# only what this release packages and report the rest.
+				apt_available=()
+				apt_missing=()
+				while IFS= read -r pkg; do
+					if apt-cache show "$pkg" >/dev/null 2>&1; then
+						apt_available+=("$pkg")
+					else
+						apt_missing+=("$pkg")
+					fi
+				done < <(grep -v '^\s*#' "$DOTFILES_DIR/linux-packages.txt" | grep -v '^\s*$')
+				if ((${#apt_available[@]})); then
+					sudo apt-get install -y "${apt_available[@]}"
+				fi
+				if ((${#apt_missing[@]})); then
+					echo "install: not packaged on this release, install manually: ${apt_missing[*]}" >&2
+				fi
+			else
+				echo "install: Linux bootstrap is advisory only. Recommended packages:" >&2
+				grep -v '^\s*#' "$DOTFILES_DIR/linux-packages.txt" | grep -v '^\s*$' | sed 's/^/  - /' >&2
+				echo "install: install them with your package manager, e.g. sudo apt install <pkg>..." >&2
+			fi
 			;;
 	esac
 fi

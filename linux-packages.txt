@@ -1,6 +1,8 @@
 # Tools the shell config expects to be available, on Linux.
-# Package names assume Debian/Ubuntu (apt). Adjust for your distro.
-# install.sh prints the recommended apt command on Linux but does not run it.
+# Package names are valid for both Arch (pacman) and Debian/Ubuntu (apt).
+# install.sh installs these via pacman --needed on Arch, or via apt on
+# Debian/Ubuntu (skipping names the release doesn't package and listing them
+# for manual install). On other distros it only prints the list.
 
 zoxide
 fastfetch
