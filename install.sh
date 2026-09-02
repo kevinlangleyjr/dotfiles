@@ -318,6 +318,54 @@ if [[ "$BOOTSTRAP" == "yes" ]]; then
 	esac
 fi
 
+# Point Claude Code's statusline at the script that ships with claude-skills.
+# ~/.claude/settings.json belongs to Claude Code (it writes theme, tui, and
+# friends there itself), so the key is merged into the existing file rather than
+# the file being symlinked, and a statusLine already pointing elsewhere is left
+# as-is. This runs after the bootstrap step because both the merge below and
+# statusline.sh itself need jq.
+install_claude_statusline() {
+	local script="$CLAUDE_SKILLS_DIR/statusline.sh"
+	local settings="$HOME/.claude/settings.json"
+	local existing='{}' current='' tmp
+
+	[[ -f "$script" ]] || return 0
+	if ! command -v jq >/dev/null 2>&1; then
+		echo "install: jq not found; skipped Claude Code statusline wiring" >&2
+		return 0
+	fi
+	# -s (not -f) so an empty settings.json falls through to the '{}' default
+	# instead of being parsed as invalid.
+	if [[ -s "$settings" ]]; then
+		if ! jq -e 'type == "object"' "$settings" >/dev/null 2>&1; then
+			echo "install: $settings is not a JSON object; left it alone" >&2
+			return 0
+		fi
+		existing=$(cat "$settings")
+		current=$(jq -r '.statusLine.command // empty' "$settings")
+	fi
+	if [[ "$current" == "$script" ]]; then
+		echo "install: Claude Code statusline already wired" >&2
+		return 0
+	fi
+	if [[ -n "$current" ]]; then
+		echo "install: statusLine already set to $current; left it alone" >&2
+		return 0
+	fi
+
+	mkdir -p "$(dirname "$settings")"
+	tmp=$(mktemp)
+	if jq --arg cmd "$script" '.statusLine = {type: "command", command: $cmd}' <<<"$existing" >"$tmp"; then
+		# Swap the whole file in so an interrupted write can't truncate settings.
+		mv "$tmp" "$settings"
+		echo "install: Claude Code statusline -> $script" >&2
+	else
+		rm -f "$tmp"
+		echo "install: failed to update $settings; skipped statusline wiring" >&2
+	fi
+}
+install_claude_statusline
+
 cat <<'EOF'
 
 Dotfiles linked. Restart the shell or run: source ~/.zshrc
