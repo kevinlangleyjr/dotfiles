@@ -135,6 +135,34 @@ if [[ -d "$HOME/.claude/skills/.git" ]]; then
 else
 	fail "claude-skills not cloned at ~/.claude/skills"
 fi
+# Claude Code's statusline needs all three links in the chain: the script, the
+# settings.json key that invokes it, and jq — statusline.sh shells out to jq for
+# every field it renders, so a missing jq yields a blank statusline and no error.
+claude_statusline="$HOME/.claude/skills/statusline.sh"
+claude_settings="$HOME/.claude/settings.json"
+if [[ -x "$claude_statusline" ]]; then
+	ok "claude statusline script present"
+else
+	fail "statusline.sh missing or not executable at ~/.claude/skills/statusline.sh"
+fi
+if [[ ! -f "$claude_settings" ]]; then
+	fail "~/.claude/settings.json missing — re-run install.sh to wire the statusline"
+elif command -v jq >/dev/null 2>&1; then
+	statusline_cmd="$(jq -r '.statusLine.command // empty' "$claude_settings" 2>/dev/null)"
+	if [[ "$statusline_cmd" == "$claude_statusline" ]]; then
+		ok "settings.json statusLine → ~/.claude/skills/statusline.sh"
+	elif [[ -n "$statusline_cmd" ]]; then
+		warn "settings.json statusLine points at $statusline_cmd, not statusline.sh"
+	else
+		fail "settings.json has no statusLine — re-run install.sh to wire it"
+	fi
+elif grep -q '"statusLine"' "$claude_settings" 2>/dev/null; then
+	# jq is missing (also reported under tools below), so fall back to a plain
+	# substring check and flag that the statusline can't actually render.
+	warn "settings.json has a statusLine but jq is missing, so it renders empty"
+else
+	fail "settings.json has no statusLine — re-run install.sh to wire it"
+fi
 # ~/.gitconfig-os is only created on the --git install path, so a missing link
 # is a warning rather than a hard failure.
 if [[ -L "$HOME/.gitconfig-os" ]]; then
@@ -176,7 +204,7 @@ done
 
 echo
 echo "Brewed tools (from Brewfile)"
-for tool in oh-my-posh zoxide fastfetch lsd lolcat figlet rg delta direnv; do
+for tool in oh-my-posh zoxide fastfetch lsd lolcat figlet rg delta direnv jq; do
 	if command -v "$tool" >/dev/null 2>&1; then
 		ok "$tool"
 	else
