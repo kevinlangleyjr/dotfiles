@@ -167,6 +167,12 @@ DELTA_SLATEWAVE_DIR="$HOME/.config/delta-slatewave"
 DELTA_SLATEWAVE_URL="${DELTA_SLATEWAVE_URL:-ssh://git@github.com/kevinlangleyjr/delta-slatewave.git}"
 clone_if_absent "$DELTA_SLATEWAVE_DIR" "$DELTA_SLATEWAVE_URL" "delta-slatewave"
 
+# Claude Code reads user skills from ~/.claude/skills/<name>/SKILL.md, so the
+# skills repo is the skills dir itself rather than something symlinked into it.
+CLAUDE_SKILLS_DIR="$HOME/.claude/skills"
+CLAUDE_SKILLS_URL="${CLAUDE_SKILLS_URL:-git@github.com:kevinlangleyjr/claude-skills.git}"
+clone_if_absent "$CLAUDE_SKILLS_DIR" "$CLAUDE_SKILLS_URL" "claude-skills"
+
 case "$(uname -s)" in
 	Darwin) ln -sf "$DOTFILES_DIR/.macos_env" "$HOME/.macos_env" ;;
 	Linux) ln -sf "$DOTFILES_DIR/.linux_env" "$HOME/.linux_env" ;;
@@ -215,6 +221,13 @@ for script in "$DOTFILES_DIR"/bin/*; do
 	[[ -f "$script" && -x "$script" ]] || continue
 	ln -sf "$script" "$HOME/.local/bin/$(basename "$script")"
 done
+
+# The skills repo ships its own CLI helpers (ticktick, gather, prs, ...) next to
+# the skills that call them, and knows which ones are meant to be on PATH.
+if [[ -x "$CLAUDE_SKILLS_DIR/link-bins.sh" ]]; then
+	echo "install: linking claude-skills CLI tools..." >&2
+	"$CLAUDE_SKILLS_DIR/link-bins.sh"
+fi
 
 # Install Neovim (Linux) from the official self-contained tarball, which ships
 # the binary together with its runtime (share/nvim/runtime). Copying just the
