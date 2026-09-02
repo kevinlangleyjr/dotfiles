@@ -24,3 +24,21 @@ less
 # whatever claims image/png — a browser, on a fresh machine.
 loupe
 papers
+
+# Screen lock and the idle ladder that drives it (hyprlock.conf / hypridle.conf).
+hyprlock
+hypridle
+
+# polkit's authentication *agent*. polkitd answers on D-Bus but draws no UI, so
+# without an agent running anything asking for privileges — mounting a disk in
+# Nautilus, say — fails with no prompt. Started from hyprland.lua's autostart.
+polkit-kde-agent
+
+# paccache, for trimming /var/cache/pacman/pkg. Enable paccache.timer to run it
+# weekly, or the cache grows without bound.
+pacman-contrib
+
+# Battery/performance profile switching on the laptop. Chosen over tlp because
+# it exposes profiles over D-Bus (so the AGS quick settings can drive it) and
+# the two conflict if both are installed.
+power-profiles-daemon

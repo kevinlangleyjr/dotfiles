@@ -181,6 +181,33 @@ else
 	warn "~/.gitconfig-os absent (only created on the --git install path)"
 fi
 
+# Only meaningful inside a running Hyprland session; skipped elsewhere (macOS,
+# a TTY, an SSH shell) so the doctor stays useful on every machine.
+if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
+	echo
+	echo "Hyprland session"
+	for conf in hyprlock.conf hypridle.conf; do
+		if [[ -f "$HOME/.config/hypr/$conf" ]]; then
+			ok "$conf present"
+		else
+			fail "~/.config/hypr/$conf missing — the screen will never lock"
+		fi
+	done
+	# Both of these are started from hyprland.lua and fail silently when absent:
+	# no idle lock, and no dialog for anything asking for privileges. The agent is matched on the 15-char name the kernel
+	# stores in /proc/<pid>/comm, since the real binary name is longer.
+	if pgrep -x hypridle >/dev/null 2>&1; then
+		ok "hypridle running"
+	else
+		fail "hypridle not running — nothing locks the screen on idle"
+	fi
+	if pgrep -x polkit-kde-auth >/dev/null 2>&1; then
+		ok "polkit agent running"
+	else
+		fail "no polkit agent running — privilege prompts will never appear"
+	fi
+fi
+
 echo
 echo "PATH"
 if [[ ":$PATH:" == *":$HOME/.local/bin:"* ]]; then
