@@ -204,7 +204,7 @@ done
 
 echo
 echo "Brewed tools (from Brewfile)"
-for tool in oh-my-posh zoxide fastfetch lsd lolcat figlet rg delta direnv jq; do
+for tool in oh-my-posh zoxide fastfetch lsd lolcat figlet rg delta direnv jq less; do
 	if command -v "$tool" >/dev/null 2>&1; then
 		ok "$tool"
 	else
