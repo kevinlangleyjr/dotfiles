@@ -3,6 +3,10 @@
 # install.sh installs these via pacman --needed on Arch, or via apt on
 # Debian/Ubuntu (skipping names the release doesn't package and listing them
 # for manual install). On other distros it only prints the list.
+#
+# Shell tooling only. Everything the Hyprland desktop needs — compositor,
+# shell, lock screen, login, portals — lives in slatewave-desktop's
+# packages.txt and packages-aur.txt, installed by its own installer.
 
 zoxide
 fastfetch
@@ -20,44 +24,10 @@ jq
 # not pull it in with base.
 less
 
-# Image and PDF viewers. Without one installed, xdg-open sends screenshots to
-# whatever claims image/png — a browser, on a fresh machine.
-loupe
-papers
-
-# Screen lock and the idle ladder that drives it (hyprlock.conf / hypridle.conf).
-hyprlock
-hypridle
-
-# polkit's authentication *agent*. polkitd answers on D-Bus but draws no UI, so
-# without an agent running anything asking for privileges — mounting a disk in
-# Nautilus, say — fails with no prompt. Started from hyprland.lua's autostart.
-polkit-kde-agent
-
 # paccache, for trimming /var/cache/pacman/pkg. Enable paccache.timer to run it
 # weekly, or the cache grows without bound.
 pacman-contrib
 
-# Battery/performance profile switching on the laptop. Chosen over tlp because
-# it exposes profiles over D-Bus (so the AGS quick settings can drive it) and
-# the two conflict if both are installed.
-power-profiles-daemon
-
-# Clipboard history (cliphist stores, wofi is the picker in clipboard.sh) and
-# the colour picker, screen recorder and screenshot annotator wired to binds in
-# hyprland.lua.
-cliphist
-wofi
-hyprpicker
-wf-recorder
-satty
-
 # Keeps the mirrorlist fresh. Needs /etc/xdg/reflector/reflector.conf plus
 # `systemctl enable --now reflector.timer` to actually run.
 reflector
-
-# Secret Service provider (org.freedesktop.secrets). 1Password stores its
-# two-factor token through it and reports "unable to save your two-factor
-# token" when nothing implements the interface. Needs the pam_gnome_keyring
-# lines in /etc/pam.d/greetd to unlock with the login password.
-gnome-keyring

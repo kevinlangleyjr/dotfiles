@@ -181,30 +181,21 @@ else
 	warn "~/.gitconfig-os absent (only created on the --git install path)"
 fi
 
-# Only meaningful inside a running Hyprland session; skipped elsewhere (macOS,
-# a TTY, an SSH shell) so the doctor stays useful on every machine.
-if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
+# The Hyprland desktop lives in slatewave-desktop and ships its own doctor,
+# which knows about its symlinks, packages, system files and services. Hand off
+# to it when it's present rather than keeping a stale subset of its checks here.
+SLATEWAVE_DESKTOP_DIR="${SLATEWAVE_DESKTOP_DIR:-$HOME/.slatewave-desktop}"
+if [[ -x "$SLATEWAVE_DESKTOP_DIR/doctor.sh" ]]; then
 	echo
-	echo "Hyprland session"
-	for conf in hyprlock.conf hypridle.conf; do
-		if [[ -f "$HOME/.config/hypr/$conf" ]]; then
-			ok "$conf present"
-		else
-			fail "~/.config/hypr/$conf missing — the screen will never lock"
-		fi
-	done
-	# Both of these are started from hyprland.lua and fail silently when absent:
-	# no idle lock, and no dialog for anything asking for privileges. The agent is matched on the 15-char name the kernel
-	# stores in /proc/<pid>/comm, since the real binary name is longer.
-	if pgrep -x hypridle >/dev/null 2>&1; then
-		ok "hypridle running"
+	echo "Slatewave Desktop"
+	desktop_out=$("$SLATEWAVE_DESKTOP_DIR/doctor.sh" 2>&1)
+	desktop_rc=$?
+	if ((desktop_rc == 0)); then
+		# Its doctor exits 0 for warnings too, so this only means "no failures".
+		ok "no failures — $(short "$SLATEWAVE_DESKTOP_DIR/doctor.sh") for detail"
 	else
-		fail "hypridle not running — nothing locks the screen on idle"
-	fi
-	if pgrep -x polkit-kde-auth >/dev/null 2>&1; then
-		ok "polkit agent running"
-	else
-		fail "no polkit agent running — privilege prompts will never appear"
+		fail "problems reported by $(short "$SLATEWAVE_DESKTOP_DIR/doctor.sh"):"
+		printf '%s\n' "$desktop_out" | grep -E '✗|FAIL' | sed 's/^ */      /'
 	fi
 fi
 

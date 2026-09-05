@@ -4,6 +4,8 @@
 
 Personal shell and Git configuration for **macOS** and **Linux**, managed as a git repo and installed with a small symlink script.
 
+The Hyprland desktop — compositor, AGS shell, lock screen and login — lives in [**slatewave-desktop**](https://github.com/kevinlangleyjr/slatewave-desktop), which this installer offers to clone on Linux. See [Hyprland desktop](#hyprland-desktop).
+
 ## What’s in here
 
 | File                                                    | Purpose                                                                                 |
@@ -18,7 +20,7 @@ Personal shell and Git configuration for **macOS** and **Linux**, managed as a g
 | [`.zshrc.local.example`](.zshrc.local.example)          | Template for per-machine values (e.g. `CLAUDE_1P_DEV_ENV_ID`); copy to `~/.zshrc.local`              |
 | [`bin/`](bin/)                                          | Standalone helper scripts (`bak`, `dotfiles-doctor`, `dotfiles-update`, `git-cleanup`, `killport`, `portcheck`, `whichall`); installer symlinks each into `~/.local/bin` |
 | [`Brewfile`](Brewfile)                                  | macOS dependencies — installed by `install.sh` via `brew bundle` (skip with `--no-bootstrap`)         |
-| [`linux-packages.txt`](linux-packages.txt)              | Linux package list, advisory only — `install.sh` prints it but doesn't run apt for you               |
+| [`linux-packages.txt`](linux-packages.txt)              | Linux shell tooling, installed via pacman or apt (skip with `--no-bootstrap`). Desktop packages live in [slatewave-desktop](https://github.com/kevinlangleyjr/slatewave-desktop) |
 
 ## Tools the shell expects
 
@@ -36,6 +38,14 @@ These are pulled in by `Brewfile` on macOS (or `linux-packages.txt` on Linux). T
 | [nvm](https://github.com/nvm-sh/nvm)       | Node version manager — lazy-loaded; install separately       |
 
 > **Node is managed by [nvm](https://github.com/nvm-sh/nvm), which the bootstrap does NOT install.** `.zshrc` lazy-loads nvm (so it only pays the startup cost on the first `node`/`npm`/`npx` call), but it expects nvm to already be on disk. Install it yourself following the [nvm instructions](https://github.com/nvm-sh/nvm#installing-and-updating); nvm then provides `node`, `npm`, and `npx`. Without nvm, those commands won't exist.
+
+## Hyprland desktop
+
+The Linux desktop is a separate repo: [**slatewave-desktop**](https://github.com/kevinlangleyjr/slatewave-desktop). It holds the Hyprland config, the AGS shell, GTK theming, its own package lists, and the `/etc` files a session needs — none of which a macOS box or a headless server has any use for.
+
+`install.sh` prompts to clone and install it on Linux, or takes `--desktop` / `--no-desktop` (or `INSTALL_DESKTOP=yes`) to skip the prompt. It defaults to **no**, since most machines running this installer aren't desktops. The repo installs standalone, so it can equally be cloned and run on its own.
+
+Once present, `dotfiles-doctor` delegates to its `doctor.sh` and `dotfiles-update` pulls it alongside this repo.
 
 ## Requirements
 
@@ -89,6 +99,7 @@ Plus:
 - `~/.zshrc.local` seeded from `.zshrc.local.example` if it doesn't exist
 - The `slatewave-omp` oh-my-posh theme cloned to `~/.config/oh-my-posh/slatewave-omp` if missing
 - The `claude-skills` repo cloned to `~/.claude/skills` if missing, and its CLI helpers symlinked into `~/.local/bin/`
+- **Linux, opt-in:** `slatewave-desktop` cloned to `~/.slatewave-desktop` and its installer run (prompt, or `--desktop` / `--no-desktop` / `INSTALL_DESKTOP`)
 - `statusLine` merged into `~/.claude/settings.json` so Claude Code renders `~/.claude/skills/statusline.sh` (skipped if the key already points elsewhere, or if `jq` is unavailable)
 - macOS: `brew bundle` against the repo's `Brewfile` (unless `--no-bootstrap`)
 - Linux: prints the `linux-packages.txt` advisory list (unless `--no-bootstrap`)
@@ -102,8 +113,8 @@ After it runs, restart the shell or `source ~/.zshrc`.
 | Command                  | What it does                                                                                                              |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
 | `bak <path>`             | Copies a file or directory to `<path>.bak.YYYY-MM-DD-HHMMSS` in place, preserving attributes (`cp -a`). Prints the new path. |
-| `dotfiles-doctor`        | Verifies the install: repo is a git checkout, required/optional symlinks point at the repo, `~/.zshrc.local` exists, slatewave-omp and delta-slatewave cloned, the git signing profile linked, `~/.local/bin` on PATH, every `bin/` script linked, every Brewfile tool present. Exits non-zero on failures. Run after a fresh-machine install. |
-| `dotfiles-update`        | `cd $DOTFILES_DIR && git pull`. `DOTFILES_DIR` defaults to `~/.dotfiles`.                                                  |
+| `dotfiles-doctor`        | Verifies the install: repo is a git checkout, required/optional symlinks point at the repo, `~/.zshrc.local` exists, slatewave-omp and delta-slatewave cloned, the git signing profile linked, `~/.local/bin` on PATH, every `bin/` script linked, every Brewfile tool present. Delegates to `slatewave-desktop`'s `doctor.sh` when that repo is present. Exits non-zero on failures. Run after a fresh-machine install. |
+| `dotfiles-update`        | `cd $DOTFILES_DIR && git pull`, then pulls `~/.slatewave-desktop` when present. `DOTFILES_DIR` defaults to `~/.dotfiles`.  |
 | `git-cleanup`            | Fetches with `--prune`, then prompts to delete (a) local branches whose upstream is gone and (b) local branches fully merged into the default branch (resolved from `origin/HEAD`, falling back to `main`). |
 | `killport <port>`        | Kills whatever is listening on the given TCP port (`lsof` + `kill -9`). Requires `sudo`.                                   |
 | `portcheck <port>`       | Read-only counterpart to `killport`: prints what's listening on a TCP port (no `sudo` needed for your own processes).      |

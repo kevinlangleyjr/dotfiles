@@ -4,5 +4,3 @@
 *.local
 *.swp
 *.swo
-# per-machine Hyprland settings, seeded by install.sh from local.lua.example
-.config/hypr/local.lua

@@ -5,12 +5,15 @@
 #   DOTFILES              Target directory (default: repo root when run from disk, else ~/.dotfiles)
 #   REPO_URL              Override clone URL (default: SSH — requires GitHub SSH keys; set when you fork)
 #   INSTALL_GIT_DOTFILES  yes/no — link .gitconfig and .gitignore_global (skips prompt when set)
+#   INSTALL_DESKTOP       yes/no — clone and install slatewave-desktop (skips prompt when set)
 #
 # Flags:  --git           link Git config files (non-interactive)
 #         --no-git        skip Git config files (non-interactive)
+#         --desktop       install the Hyprland desktop (non-interactive)
+#         --no-desktop    skip the Hyprland desktop (non-interactive)
 #         --no-bootstrap  skip the Brewfile / linux-packages.txt step
 #
-# Local:     ./install.sh [--git|--no-git] [--no-bootstrap]
+# Local:     ./install.sh [--git|--no-git] [--desktop|--no-desktop] [--no-bootstrap]
 # Remote:    curl -fsSL https://raw.githubusercontent.com/kevinlangleyjr/dotfiles/main/install.sh | bash -s
 DEFAULT_REPO_URL='git@github.com:kevinlangleyjr/dotfiles.git'
 set -euo pipefail
@@ -21,6 +24,8 @@ for _arg in "$@"; do
 	case "$_arg" in
 		--git) INSTALL_GIT_DOTFILES=yes ;;
 		--no-git) INSTALL_GIT_DOTFILES=no ;;
+		--desktop) INSTALL_DESKTOP=yes ;;
+		--no-desktop) INSTALL_DESKTOP=no ;;
 		--no-bootstrap) BOOTSTRAP=no ;;
 	esac
 done
@@ -38,6 +43,26 @@ want_git_dotfiles() {
 	case "${reply:-y}" in
 		[nN] | [nN][oO]) return 1 ;;
 		*) return 0 ;;
+	esac
+}
+
+want_desktop() {
+	local reply
+	case "${INSTALL_DESKTOP:-}" in
+		[yY] | [yY][eE][sS] | 1 | true) return 0 ;;
+		[nN] | [nN][oO] | 0 | false) return 1 ;;
+	esac
+	# A compositor is no use on macOS or a headless server, and those are most
+	# of what this installer runs on — so unlike the git prompt, this one
+	# defaults to no when it can't ask.
+	[[ "$(uname -s)" == Linux ]] || return 1
+	if [[ ! -r /dev/tty ]]; then
+		return 1
+	fi
+	read -r -p "Install the Slatewave Hyprland desktop? [y/N] " reply </dev/tty || reply=n
+	case "${reply:-n}" in
+		[yY] | [yY][eE][sS]) return 0 ;;
+		*) return 1 ;;
 	esac
 }
 
@@ -198,26 +223,6 @@ if [[ -d "$DOTFILES_DIR/.config" ]]; then
 	done
 fi
 
-# Dark mode. The GTK settings.ini files come in via the .config link above, but
-# the preference apps actually query is the dconf one, which the portal
-# re-exports as org.freedesktop.appearance — a binary store, so it can't be
-# symlinked and has to be set here. Qt reads it through the portal too; see the
-# QT_QPA_PLATFORMTHEME env in .config/hypr/hyprland.lua.
-if command -v gsettings >/dev/null 2>&1; then
-	gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
-	gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
-fi
-
-# hyprland.lua loads ~/.config/hypr/local.lua for per-machine values (monitors,
-# scale, env) via pcall(require, "local"), so a missing file is harmless — seed
-# it anyway so new machines start from the commented template, mirroring
-# ~/.zshrc.local. Because ~/.config/hypr is a symlink into this repo, the file
-# lands in the checkout; it's gitignored so it stays per-machine.
-if [[ -f "$DOTFILES_DIR/.config/hypr/local.lua.example" && ! -e "$DOTFILES_DIR/.config/hypr/local.lua" ]]; then
-	cp "$DOTFILES_DIR/.config/hypr/local.lua.example" "$DOTFILES_DIR/.config/hypr/local.lua"
-	echo "install: created ~/.config/hypr/local.lua from template — set per-machine monitor/env values there" >&2
-fi
-
 # Seed ~/.zshrc.local from the example if it doesn't exist yet.
 if [[ ! -e "$HOME/.zshrc.local" ]]; then
 	cp "$DOTFILES_DIR/.zshrc.local.example" "$HOME/.zshrc.local"
@@ -326,6 +331,22 @@ if [[ "$BOOTSTRAP" == "yes" ]]; then
 			fi
 			;;
 	esac
+fi
+
+# The Hyprland desktop is a separate repo: it is Linux-desktop-only, the AGS
+# shell is a build with its own dependencies, and a macOS box or a headless
+# server has no use for either. It installs standalone, so all this does is
+# clone it and hand off.
+SLATEWAVE_DESKTOP_DIR="${SLATEWAVE_DESKTOP_DIR:-$HOME/.slatewave-desktop}"
+SLATEWAVE_DESKTOP_URL="${SLATEWAVE_DESKTOP_URL:-git@github.com:kevinlangleyjr/slatewave-desktop.git}"
+if want_desktop; then
+	clone_if_absent "$SLATEWAVE_DESKTOP_DIR" "$SLATEWAVE_DESKTOP_URL" "slatewave-desktop"
+	if [[ -x "$SLATEWAVE_DESKTOP_DIR/install.sh" ]]; then
+		echo "install: running the slatewave-desktop installer..." >&2
+		"$SLATEWAVE_DESKTOP_DIR/install.sh"
+	fi
+else
+	echo "install: skipped slatewave-desktop (run with --desktop to install it)" >&2
 fi
 
 # Point Claude Code's statusline at the script that ships with claude-skills.
