@@ -5,7 +5,7 @@
 #   DOTFILES              Target directory (default: repo root when run from disk, else ~/.dotfiles)
 #   REPO_URL              Override clone URL (default: SSH — requires GitHub SSH keys; set when you fork)
 #   INSTALL_GIT_DOTFILES  yes/no — link .gitconfig and .gitignore_global (skips prompt when set)
-#   INSTALL_DESKTOP       yes/no — clone and install slatewave-desktop (skips prompt when set)
+#   INSTALL_DESKTOP       yes/no — clone and install anthracite-desktop (skips prompt when set)
 #
 # Flags:  --git           link Git config files (non-interactive)
 #         --no-git        skip Git config files (non-interactive)
@@ -59,7 +59,7 @@ want_desktop() {
 	if [[ ! -r /dev/tty ]]; then
 		return 1
 	fi
-	read -r -p "Install the Slatewave Hyprland desktop? [y/N] " reply </dev/tty || reply=n
+	read -r -p "Install the Anthracite Hyprland desktop? [y/N] " reply </dev/tty || reply=n
 	case "${reply:-n}" in
 		[yY] | [yY][eE][sS]) return 0 ;;
 		*) return 1 ;;
@@ -337,16 +337,16 @@ fi
 # shell is a build with its own dependencies, and a macOS box or a headless
 # server has no use for either. It installs standalone, so all this does is
 # clone it and hand off.
-SLATEWAVE_DESKTOP_DIR="${SLATEWAVE_DESKTOP_DIR:-$HOME/.slatewave-desktop}"
-SLATEWAVE_DESKTOP_URL="${SLATEWAVE_DESKTOP_URL:-git@github.com:kevinlangleyjr/slatewave-desktop.git}"
+ANTHRACITE_DIR="${ANTHRACITE_DIR:-$HOME/.anthracite-desktop}"
+ANTHRACITE_URL="${ANTHRACITE_URL:-git@github.com:kevinlangleyjr/anthracite-desktop.git}"
 if want_desktop; then
-	clone_if_absent "$SLATEWAVE_DESKTOP_DIR" "$SLATEWAVE_DESKTOP_URL" "slatewave-desktop"
-	if [[ -x "$SLATEWAVE_DESKTOP_DIR/install.sh" ]]; then
-		echo "install: running the slatewave-desktop installer..." >&2
-		"$SLATEWAVE_DESKTOP_DIR/install.sh"
+	clone_if_absent "$ANTHRACITE_DIR" "$ANTHRACITE_URL" "anthracite-desktop"
+	if [[ -x "$ANTHRACITE_DIR/install.sh" ]]; then
+		echo "install: running the anthracite-desktop installer..." >&2
+		"$ANTHRACITE_DIR/install.sh"
 	fi
 else
-	echo "install: skipped slatewave-desktop (run with --desktop to install it)" >&2
+	echo "install: skipped anthracite-desktop (run with --desktop to install it)" >&2
 fi
 
 # Point Claude Code's statusline at the script that ships with claude-skills.

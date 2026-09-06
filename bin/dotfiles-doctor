@@ -181,20 +181,20 @@ else
 	warn "~/.gitconfig-os absent (only created on the --git install path)"
 fi
 
-# The Hyprland desktop lives in slatewave-desktop and ships its own doctor,
+# The Hyprland desktop lives in anthracite-desktop and ships its own doctor,
 # which knows about its symlinks, packages, system files and services. Hand off
 # to it when it's present rather than keeping a stale subset of its checks here.
-SLATEWAVE_DESKTOP_DIR="${SLATEWAVE_DESKTOP_DIR:-$HOME/.slatewave-desktop}"
-if [[ -x "$SLATEWAVE_DESKTOP_DIR/doctor.sh" ]]; then
+ANTHRACITE_DIR="${ANTHRACITE_DIR:-$HOME/.anthracite-desktop}"
+if [[ -x "$ANTHRACITE_DIR/doctor.sh" ]]; then
 	echo
-	echo "Slatewave Desktop"
-	desktop_out=$("$SLATEWAVE_DESKTOP_DIR/doctor.sh" 2>&1)
+	echo "Anthracite Desktop"
+	desktop_out=$("$ANTHRACITE_DIR/doctor.sh" 2>&1)
 	desktop_rc=$?
 	if ((desktop_rc == 0)); then
 		# Its doctor exits 0 for warnings too, so this only means "no failures".
-		ok "no failures — $(short "$SLATEWAVE_DESKTOP_DIR/doctor.sh") for detail"
+		ok "no failures — $(short "$ANTHRACITE_DIR/doctor.sh") for detail"
 	else
-		fail "problems reported by $(short "$SLATEWAVE_DESKTOP_DIR/doctor.sh"):"
+		fail "problems reported by $(short "$ANTHRACITE_DIR/doctor.sh"):"
 		printf '%s\n' "$desktop_out" | grep -E '✗|FAIL' | sed 's/^ */      /'
 	fi
 fi

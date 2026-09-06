@@ -5,7 +5,7 @@
 # for manual install). On other distros it only prints the list.
 #
 # Shell tooling only. Everything the Hyprland desktop needs — compositor,
-# shell, lock screen, login, portals — lives in slatewave-desktop's
+# shell, lock screen, login, portals — lives in anthracite-desktop's
 # packages.txt and packages-aur.txt, installed by its own installer.
 
 zoxide

@@ -15,8 +15,8 @@ git pull
 # install.sh clones its sibling repos as independent checkouts, so pulling
 # dotfiles leaves them behind. The desktop one changes often enough to be worth
 # pulling here; the theme repos are effectively static.
-desktop="${SLATEWAVE_DESKTOP_DIR:-$HOME/.slatewave-desktop}"
+desktop="${ANTHRACITE_DIR:-$HOME/.anthracite-desktop}"
 if [[ -d "$desktop/.git" ]]; then
-	echo "dotfiles-update: pulling slatewave-desktop..." >&2
+	echo "dotfiles-update: pulling anthracite-desktop..." >&2
 	git -C "$desktop" pull
 fi
