@@ -1,0 +1,65 @@
+---
+# Slatewave — LSD (lsd-rs/lsd) theme
+# https://getslatewave.com
+#
+# A calm, slate-and-teal palette tuned to match the Slatewave theme family
+# (VSCode, Alacritty, Ghostty, Obsidian, Starship, …). Values are hex strings —
+# LSD ≥ 1.1 accepts "#rrggbb" alongside the legacy named colors and the ANSI
+# 256-color index. On LSD 1.0.x, hex values are silently ignored; use the
+# sibling colors-256.yaml instead. File-type colors (directories, executables,
+# archives, …) are driven by LS_COLORS, not this file — pair Slatewave with
+# any LS_COLORS scheme you like (vivid, trapd00r, etc.).
+
+# Owner / group columns
+user:  "#fda4af"    # rose-300    — owner highlight
+group: "#94a3b8"    # slate-400   — fg_muted
+
+# rwx permission bits, ACL indicator, SELinux context
+permission:
+  read:        "#5eead4"   # teal-300    — signature accent; readable
+  write:       "#fbbf24"   # amber-400   — caution; writable
+  exec:        "#fb7185"   # rose-400    — hot; executable
+  exec-sticky: "#b388ff"   # purple      — rare setuid / sticky bit
+  no-access:   "#64748b"   # slate-500   — muted "-" placeholder
+  octal:       "#0e7490"   # cyan-700    — --permission=octal suffix
+  acl:         "#67e8f9"   # cyan-300    — extended ACL indicator
+  context:     "#38bdf8"   # sky-400     — SELinux label
+
+# Modified-time column — freshness ramp from teal to slate
+date:
+  hour-old: "#5eead4"   # teal-300    — changed in the last hour
+  day-old:  "#99f6e4"   # teal-200    — changed today
+  older:    "#94a3b8"   # slate-400   — anything older
+
+# Size column — quiet for small, warm for large
+size:
+  none:   "#64748b"    # slate-500   — not a regular file
+  small:  "#cbd5e1"    # slate-300   — fg_subtle
+  medium: "#fbbf24"    # amber-400
+  large:  "#b45309"    # amber-700
+
+# Inode column (--inode / -i)
+inode:
+  valid:   "#b388ff"   # purple
+  invalid: "#64748b"   # slate-500
+
+# Hard-link count column
+links:
+  valid:   "#7dd3fc"   # sky-300
+  invalid: "#fb7185"   # rose-400
+
+# Tree-view guide lines (--tree)
+tree-edge: "#475569"   # slate-600   — quiet structural chrome
+
+# Git status column (--git)
+git-status:
+  default:        "#cbd5e1"   # slate-300   — catchall
+  unmodified:     "#64748b"   # slate-500   — "."
+  ignored:        "#475569"   # slate-600   — "!!"
+  new-in-index:   "#5eead4"   # teal-300    — staged add (A)
+  new-in-workdir: "#99f6e4"   # teal-200    — untracked (??)
+  typechange:     "#b45309"   # amber-700   — type change (T)
+  deleted:        "#fb7185"   # rose-400    — deleted (D)
+  renamed:        "#7dd3fc"   # sky-300     — renamed (R)
+  modified:       "#fbbf24"   # amber-400   — modified (M)
+  conflicted:     "#ef5350"   # red-bright  — conflicted (U)
