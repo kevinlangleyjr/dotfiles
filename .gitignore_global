@@ -107,3 +107,7 @@ node_modules
 ###################
 .stversions
 .stfolder
+###############################
+# Claude Code personal config #
+###############################
+CLAUDE.local.md

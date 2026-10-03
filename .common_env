@@ -170,7 +170,7 @@ fi
 if command -v lolcat >/dev/null 2>&1; then
 	alias lol='lolcat'                                                    # cmd | lol
 	alias lola='lolcat -a -d 2'                                           # animated rainbow
-	alias glog='git log --oneline --decorate --graph --all | lolcat'
+	alias glog='git log --oneline --decorate --graph --all'
 	alias llr='ls -lah | lolcat'
 fi
 
