@@ -13,6 +13,9 @@ if [ -d "$HOME/.local/bin" ] && [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
 	PATH="$HOME/.local/bin:$PATH"
 fi
 
+# npm prefix dir for `npm i -g` outside nvm (npm config set prefix ~/.npm-global)
+[ -d "$HOME/.npm-global/bin" ] && PATH="$HOME/.npm-global/bin:$PATH"
+
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
 # yarn: the `yarn` command comes via corepack on the node bin dir (added below).
@@ -83,5 +86,3 @@ fi
 if command -v oh-my-posh >/dev/null 2>&1; then
 	eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/slatewave-omp/slatewave.omp.yml)"
 fi
-
-export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:$PATH"

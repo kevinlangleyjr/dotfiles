@@ -36,8 +36,6 @@
 	g = grep -I
 	lg = -c core.pager='lolcat -f | less -R' log --decorate --graph
 	pp = !"echo 'Pull'; git pull; echo 'Push'; git push"
-	rb = rbranch
-	rv = review
 	st = status
 
 [color]

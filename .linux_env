@@ -8,5 +8,3 @@ elif command -v xclip >/dev/null 2>&1; then
 	alias copy="xclip -selection clipboard"
 	alias paste="xclip -selection clipboard -o"
 fi
-
-autoload -U add-zsh-hook
