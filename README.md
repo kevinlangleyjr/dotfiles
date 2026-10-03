@@ -16,10 +16,11 @@ The Hyprland desktop — compositor, AGS shell, lock screen and login — lives 
 | [`.gitconfig`](.gitconfig)                              | Default Git identity + global config; uses `includeIf` to load `.gitconfig-agilebits` for 1P repo paths |
 | [`.gitconfig-agilebits`](.gitconfig-agilebits)          | Work identity overrides — applied via `includeIf` for `~/Development/1P/` and `~/go/src/go.1password.io/` |
 | [`.gitignore_global`](.gitignore_global)                | Patterns ignored by Git everywhere (`core.excludesFile`)                                |
+| [`.config/`](.config/)                                  | XDG config dirs (`lsd` theme, `git/allowed_signers`); each subdir is linked to `~/.config/<name>` |
 | [`.zshrc`](.zshrc)                                      | Zsh entrypoint (oh-my-posh + slatewave theme, zoxide, lazy nvm). Linked by the installer; an existing `~/.zshrc` is moved to `~/.zshrc.old` first |
 | [`.zshrc.local.example`](.zshrc.local.example)          | Template for per-machine values (e.g. `CLAUDE_1P_DEV_ENV_ID`); copy to `~/.zshrc.local`              |
 | [`bin/`](bin/)                                          | Standalone helper scripts (`bak`, `dotfiles-doctor`, `dotfiles-update`, `git-cleanup`, `killport`, `portcheck`, `whichall`); installer symlinks each into `~/.local/bin` |
-| [`Brewfile`](Brewfile)                                  | macOS dependencies — installed by `install.sh` via `brew bundle` (skip with `--no-bootstrap`)         |
+| [`Brewfile`](Brewfile)                                  | macOS dependencies — installed by `install.sh` via `brew bundle` (skip with `--no-bootstrap`). `brew bundle check --file=Brewfile` shows drift |
 | [`linux-packages.txt`](linux-packages.txt)              | Linux shell tooling, installed via pacman or apt (skip with `--no-bootstrap`). Desktop packages live in [anthracite-desktop](https://github.com/kevinlangleyjr/anthracite-desktop) |
 
 ## Tools the shell expects
@@ -32,6 +33,9 @@ These are pulled in by `Brewfile` on macOS (or `linux-packages.txt` on Linux). T
 | [zoxide](https://github.com/ajeetdsouza/zoxide)        | Frecency-ranked `cd`. Backs the `j` / `s` / `d` / `p` aliases. |
 | [fastfetch](https://github.com/fastfetch-cli/fastfetch) | System info splash on shell launch                          |
 | [lsd](https://github.com/lsd-rs/lsd)       | Modern `ls`; backs `ll`                                      |
+| [lstr](https://github.com/bgreenwell/lstr) | Tree view; backs `t`                                         |
+| [neovim](https://neovim.io/)               | Backs `vi`; Linux installs the official tarball via `install.sh` |
+| [bat](https://github.com/sharkdp/bat), [fzf](https://github.com/junegunn/fzf) | Installed for interactive use; not yet wired into the shell |
 | [ripgrep](https://github.com/BurntSushi/ripgrep) | Faster `grep`; backs the global `\|G` alias              |
 | [git-delta](https://github.com/dandavison/delta) | Git diff pager (configured in `.gitconfig`)            |
 | `figlet`, `lolcat`                         | Banner / rainbow text helpers (`label`, `title`, `hero`, `morning`) |
@@ -92,6 +96,7 @@ Symlinks created in `$HOME` pointing at the repo:
 - **Optional (prompt or `INSTALL_GIT_DOTFILES` / `--git` / `--no-git`):** `.gitconfig`, `.gitignore_global`, `.gitconfig-agilebits` — any pre-existing file is moved to `.<name>.old` (and a prior `.old` is shifted to `.old.bak`) before linking, unless it's already a symlink to this repo's copy
 - **Always:** `.zshrc`, `.common_env`
 - **Always (OS-specific):** `.macos_env` on Darwin, `.linux_env` on Linux
+- **Always:** each directory under `.config/` linked to `~/.config/<name>` (directory-level, so new files inside are picked up without touching the installer)
 
 Plus:
 
@@ -102,7 +107,7 @@ Plus:
 - **Linux, opt-in:** `anthracite-desktop` cloned to `~/.anthracite-desktop` and its installer run (prompt, or `--desktop` / `--no-desktop` / `INSTALL_DESKTOP`)
 - `statusLine` merged into `~/.claude/settings.json` so Claude Code renders `~/.claude/skills/statusline.sh` (skipped if the key already points elsewhere, or if `jq` is unavailable)
 - macOS: `brew bundle` against the repo's `Brewfile` (unless `--no-bootstrap`)
-- Linux: prints the `linux-packages.txt` advisory list (unless `--no-bootstrap`)
+- Linux: installs `linux-packages.txt` via `pacman --needed` or `apt-get` (unless `--no-bootstrap`); other distros get the list printed
 
 After it runs, restart the shell or `source ~/.zshrc`.
 
@@ -153,11 +158,27 @@ Signing is configured **per machine**. Git can't branch on OS or host, so `insta
 
 On Linux the installer picks the server profile when 1Password's `op-ssh-sign` (`/opt/1Password/op-ssh-sign`) isn't present, so a headless box with no 1Password falls back to the native signer automatically.
 
+`gpg.ssh.allowedSignersFile` points at `~/.config/git/allowed_signers`, linked from this repo, so `git log --show-signature` can verify commits on every host.
+
 `~/.gitconfig` also `include`s `~/.gitconfig.local` **last** (untracked, optional — a missing path is silently ignored), so per-machine overrides win over the profile above. That's where a server keeps its own signing key path (e.g. `user.signingkey`) without committing it.
+
+## SSH host aliases (not tracked)
+
+`.gitconfig` rewrites `agilebits-inc` GitHub URLs to the `github-enterprise` SSH host alias, and 1Password GitLab URLs to port 2227. The matching `Host` blocks live in `~/.ssh/config`, which stays out of this repo because it also holds personal hosts. On a new machine add at least:
+
+```
+Host github-enterprise
+	HostName github.com
+	User git
+	IdentityFile ~/.ssh/github-enterprise.pub
+	IdentitiesOnly yes
+```
+
+`dotfiles-doctor` warns when the alias doesn't resolve.
 
 ## Troubleshooting
 
-- **Shell startup feels slow.** Profile with `time zsh -i -c exit`. The biggest contributors are usually `fastfetch` and the `nvm` lazy-load on first node invocation. The `compinit` cache rebuilds every 24h — `rm ~/.zcompdump*` forces a rebuild.
+- **Shell startup feels slow.** Profile with `time zsh -i -c exit`. `fastfetch` (~300ms) only runs in a top-level login shell, not inside tmux, VS Code, or Claude Code terminals; `oh-my-posh` is the next biggest cost. The `compinit` cache rebuilds every 24h — `rm ~/.zcompdump*` forces a rebuild.
 - **`killport: command not found`.** `~/.local/bin` isn't on `PATH`. The `.zshrc` only adds it if the directory exists — re-run `./install.sh` to create it and link the bin scripts.
 - **Wrong git identity in a commit.** `git config --local user.email` overrides any `includeIf`. Check the local repo with `git config --show-origin user.email` to see which file is winning.
 - **`oh-my-posh: command not found` on first launch.** Brewfile didn't run, or the Brewfile bootstrap was skipped. Run `./install.sh` (or `brew bundle --file=~/.dotfiles/Brewfile` directly).
