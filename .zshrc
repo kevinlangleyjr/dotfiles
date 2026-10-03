@@ -78,7 +78,11 @@ if command -v direnv >/dev/null 2>&1; then
 	eval "$(direnv hook zsh)"
 fi
 
-if command -v fastfetch >/dev/null 2>&1; then
+# Splash only on a top-level login shell: it costs ~300ms, and tmux panes,
+# editor terminals and agent-spawned shells are never looked at long enough
+# to justify that.
+if command -v fastfetch >/dev/null 2>&1 && [[ -o login ]] && [[ -z "${TMUX:-}" ]] \
+	&& [[ "${TERM_PROGRAM:-}" != vscode ]] && [[ -z "${CLAUDECODE:-}" ]]; then
 	fastfetch
 fi
 
