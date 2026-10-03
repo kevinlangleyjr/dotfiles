@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # dotfiles-doctor — verify the dotfiles install is wired up correctly.
 # Exits non-zero if any required check fails. Optional checks emit warnings.
+#
+# shellcheck disable=SC2088  # "~/" in messages is display text, not a path
 set -uo pipefail
 
 # Resolve the repo root. Honor an explicit DOTFILES_DIR override; otherwise
@@ -109,6 +111,14 @@ check_link "$HOME/.gitignore_global"    .gitignore_global    optional
 check_link "$HOME/.gitconfig-agilebits" .gitconfig-agilebits optional
 
 echo
+echo "XDG config links (.config/<name>)"
+for dir in "$DOTFILES_DIR"/.config/*/; do
+	[[ -d "$dir" ]] || continue
+	dir=${dir%/}
+	check_link "$HOME/.config/$(basename "$dir")" ".config/$(basename "$dir")"
+done
+
+echo
 echo "Per-machine state"
 if [[ -e "$HOME/.zshrc.local" ]]; then
 	ok "~/.zshrc.local present"
@@ -179,6 +189,17 @@ elif [[ -e "$HOME/.gitconfig-os" ]]; then
 	fail "~/.gitconfig-os exists but isn't a symlink to a signing profile"
 else
 	warn "~/.gitconfig-os absent (only created on the --git install path)"
+fi
+# .gitconfig rewrites agilebits-inc URLs to the github-enterprise SSH host alias,
+# which lives in ~/.ssh/config (not tracked here: it carries personal hosts).
+# ssh -G resolves the alias offline; an unknown Host echoes the name back.
+if [[ -L "$HOME/.gitconfig" ]]; then
+	if command -v ssh >/dev/null 2>&1 \
+		&& [[ "$(ssh -G github-enterprise 2>/dev/null | awk '/^hostname /{print $2}')" == github.com ]]; then
+		ok "ssh host alias github-enterprise -> github.com"
+	else
+		warn "ssh host alias github-enterprise not defined in ~/.ssh/config; agilebits-inc clones will fail"
+	fi
 fi
 
 # The Hyprland desktop lives in anthracite-desktop and ships its own doctor,

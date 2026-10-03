@@ -19,15 +19,12 @@ jobs:
           persist-credentials: false
 
       # shellcheck is preinstalled on ubuntu-latest runners.
-      # --severity=error keeps pre-existing style/info/warning lint from
-      # failing the build. Tighten to --severity=warning (or drop the flag)
-      # once the scripts are clean.
       - name: shellcheck bash scripts
         run: |
-          shellcheck --severity=error install.sh
+          shellcheck --severity=warning install.sh
           for f in bin/*; do
             [ -f "$f" ] || continue
-            shellcheck --severity=error "$f"
+            shellcheck --severity=warning "$f"
           done
 
       - name: bash -n syntax check
