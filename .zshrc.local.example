@@ -6,7 +6,10 @@
 #
 #   cp .zshrc.local.example ~/.zshrc.local
 
-# 1Password / Claude dev environment ID — get this from your local 1P setup.
+# 1Password Environment the Claude skills read (TickTick, Oura, Fitbit, EasyPost,
+# GitLab tokens). In the 1Password app: Developer > View Environments > Manage
+# environment > Copy environment ID. Read via `op-sa claude-skills`, whose token
+# lives in ~/.config/claude-skills/op-token.
 # export CLAUDE_1P_DEV_ENV_ID=""
 
 # Any other per-machine env, aliases, or PATH bits go here.

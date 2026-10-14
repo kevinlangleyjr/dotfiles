@@ -19,7 +19,7 @@ The Hyprland desktop — compositor, AGS shell, lock screen and login — lives 
 | [`.config/`](.config/)                                  | XDG config dirs (`lsd` theme, `git/allowed_signers`); each subdir is linked to `~/.config/<name>` |
 | [`.zshrc`](.zshrc)                                      | Zsh entrypoint (oh-my-posh + slatewave theme, zoxide, lazy nvm). Linked by the installer; an existing `~/.zshrc` is moved to `~/.zshrc.old` first |
 | [`.zshrc.local.example`](.zshrc.local.example)          | Template for per-machine values (e.g. `CLAUDE_1P_DEV_ENV_ID`); copy to `~/.zshrc.local`              |
-| [`bin/`](bin/)                                          | Standalone helper scripts (`bak`, `dotfiles-doctor`, `dotfiles-update`, `git-cleanup`, `killport`, `portcheck`, `whichall`); installer symlinks each into `~/.local/bin` |
+| [`bin/`](bin/)                                          | Standalone helper scripts (`bak`, `dotfiles-doctor`, `dotfiles-update`, `git-cleanup`, `killport`, `op-sa`, `portcheck`, `whichall`); installer symlinks each into `~/.local/bin` |
 | [`Brewfile`](Brewfile)                                  | macOS dependencies — installed by `install.sh` via `brew bundle` (skip with `--no-bootstrap`). `brew bundle check --file=Brewfile` shows drift |
 | [`linux-packages.txt`](linux-packages.txt)              | Linux shell tooling, installed via pacman or apt (skip with `--no-bootstrap`). Desktop packages live in [anthracite-desktop](https://github.com/kevinlangleyjr/anthracite-desktop) |
 
@@ -119,6 +119,7 @@ After it runs, restart the shell or `source ~/.zshrc`.
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
 | `bak <path>`             | Copies a file or directory to `<path>.bak.YYYY-MM-DD-HHMMSS` in place, preserving attributes (`cp -a`). Prints the new path. |
 | `dotfiles-doctor`        | Verifies the install: repo is a git checkout, required/optional symlinks point at the repo, `~/.zshrc.local` exists, slatewave-omp and delta-slatewave cloned, the git signing profile linked, `~/.local/bin` on PATH, every `bin/` script linked, every Brewfile tool present. Delegates to `anthracite-desktop`'s `doctor.sh` when that repo is present. Exits non-zero on failures. Run after a fresh-machine install. |
+| `op-sa`                  | Runs `op` as a named service account: `op-sa <profile> <op args>` reads the token from `~/.config/<profile>/op-token` (mode 600) and exposes it to that one `op` process only, so interactive `op` keeps using the desktop app. Profiles in use: `claude-skills` (the Claude dev Environment), `homeserver`, and `domnr` (Development + Domnr vaults). |
 | `dotfiles-update`        | `cd $DOTFILES_DIR && git pull`, then pulls `~/.anthracite-desktop` when present. `DOTFILES_DIR` defaults to `~/.dotfiles`.  |
 | `git-cleanup`            | Fetches with `--prune`, then prompts to delete (a) local branches whose upstream is gone and (b) local branches fully merged into the default branch (resolved from `origin/HEAD`, falling back to `main`). |
 | `killport <port>`        | Kills whatever is listening on the given TCP port (`lsof` + `kill -9`). Requires `sudo`.                                   |

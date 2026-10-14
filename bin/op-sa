@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# op-sa — run the 1Password CLI as a named service account.
+#
+#   op-sa <profile> <op args...>
+#
+# Reads the token from ~/.config/<profile>/op-token (override the directory
+# with OP_SA_CONFIG_DIR) and puts it in the environment of that single `op`
+# process only, so interactive `op` use elsewhere keeps going through the
+# desktop app and your personal vaults. Each profile is its own service
+# account scoped to just what that consumer needs, so one token can be
+# revoked without touching the others.
+#
+#   op-sa claude-skills whoami
+#   op-sa claude-skills environment read "$CLAUDE_1P_DEV_ENV_ID"
+#   op-sa homeserver run --environment "$HOME_SERVER_ENV_ID" -- docker compose up -d
+
+set -euo pipefail
+
+if [ $# -lt 1 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+	sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'
+	exit 2
+fi
+
+profile="$1"
+shift
+
+case "$profile" in
+	*/* | .* | "")
+		echo "op-sa: profile must be a plain name, got '$profile'" >&2
+		exit 2
+		;;
+esac
+
+token_file="${OP_SA_CONFIG_DIR:-$HOME/.config}/$profile/op-token"
+
+if [ ! -r "$token_file" ]; then
+	echo "op-sa: no token for profile '$profile' at $token_file" >&2
+	echo "op-sa: create it with: (umask 077; mkdir -p \"$(dirname "$token_file")\"; printf '%s' 'ops_...' > \"$token_file\")" >&2
+	exit 1
+fi
+
+perms="$(stat -c '%a' "$token_file" 2>/dev/null || stat -f '%Lp' "$token_file")"
+if [ "$perms" != "600" ] && [ "$perms" != "400" ]; then
+	echo "op-sa: refusing to use $token_file with mode $perms (expected 600)" >&2
+	exit 1
+fi
+
+OP_SERVICE_ACCOUNT_TOKEN="$(tr -d '[:space:]' <"$token_file")" exec op "$@"
