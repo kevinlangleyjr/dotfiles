@@ -125,15 +125,10 @@ if [[ -e "$HOME/.zshrc.local" ]]; then
 else
 	warn "~/.zshrc.local missing — copy .zshrc.local.example"
 fi
-if [[ -d "$HOME/.config/oh-my-posh/slatewave-omp/.git" ]]; then
-	ok "slatewave-omp cloned"
+if [[ -f "$HOME/.config/oh-my-posh/slatewave.omp.yml" ]]; then
+	ok "slatewave oh-my-posh theme present"
 else
-	fail "slatewave-omp not cloned at ~/.config/oh-my-posh/slatewave-omp"
-fi
-if [[ -f "$HOME/.config/oh-my-posh/slatewave-omp/slatewave.omp.yml" ]]; then
-	ok "oh-my-posh theme present"
-else
-	fail "oh-my-posh theme missing at ~/.config/oh-my-posh/slatewave-omp/slatewave.omp.yml"
+	fail "slatewave oh-my-posh theme missing at ~/.config/oh-my-posh/slatewave.omp.yml (install.sh fetches it, or run: slatewave install oh-my-posh)"
 fi
 if [[ -d "$HOME/.config/delta-slatewave/.git" ]]; then
 	ok "delta-slatewave cloned"

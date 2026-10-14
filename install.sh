@@ -184,9 +184,18 @@ ln -sf "$DOTFILES_DIR/.zshrc" "$HOME/.zshrc"
 move_existing_to_old "$HOME/.common_env" "$DOTFILES_DIR/.common_env"
 ln -sf "$DOTFILES_DIR/.common_env" "$HOME/.common_env"
 
-SLATEWAVE_OMP_DIR="$HOME/.config/oh-my-posh/slatewave-omp"
-SLATEWAVE_OMP_URL="${SLATEWAVE_OMP_URL:-git@github.com:kevinlangleyjr/slatewave-omp.git}"
-clone_if_absent "$SLATEWAVE_OMP_DIR" "$SLATEWAVE_OMP_URL" "slatewave-omp"
+# oh-my-posh theme: a single file at the path .zshrc loads. This is the same
+# file `slatewave install oh-my-posh` fetches, but the CLI also appends its own
+# init line to ~/.zshrc, which .zshrc already carries, so fetch it directly.
+SLATEWAVE_OMP_FILE="$HOME/.config/oh-my-posh/slatewave.omp.yml"
+SLATEWAVE_OMP_URL="${SLATEWAVE_OMP_URL:-https://raw.githubusercontent.com/kevinlangleyjr/slatewave-omp/main/slatewave.omp.yml}"
+if [[ -f "$SLATEWAVE_OMP_FILE" ]]; then
+	echo "install: slatewave oh-my-posh theme already present at $SLATEWAVE_OMP_FILE" >&2
+else
+	mkdir -p "$(dirname "$SLATEWAVE_OMP_FILE")"
+	curl -fsSL "$SLATEWAVE_OMP_URL" -o "$SLATEWAVE_OMP_FILE"
+	echo "install: slatewave oh-my-posh theme -> $SLATEWAVE_OMP_FILE" >&2
+fi
 
 DELTA_SLATEWAVE_DIR="$HOME/.config/delta-slatewave"
 DELTA_SLATEWAVE_URL="${DELTA_SLATEWAVE_URL:-ssh://git@github.com/kevinlangleyjr/delta-slatewave.git}"
